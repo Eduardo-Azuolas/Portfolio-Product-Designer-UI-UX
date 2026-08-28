@@ -1,0 +1,154 @@
+@import './tokens.css';
+
+/* ── Base ─────────────────────────────────────────────────────────────── */
+* { box-sizing: border-box; }
+
+html, body { margin: 0; padding: 0; background: var(--bg); }
+
+body {
+  font-family: var(--sans);
+  color: var(--ink);
+  -webkit-font-smoothing: antialiased;
+}
+
+a { color: var(--accent); text-decoration: none; }
+a:hover { color: var(--accent-hover); }
+
+::selection { background: rgba(63, 208, 255, 0.26); }
+
+/* ── Focus ────────────────────────────────────────────────────────────────
+ * One ring for every control, written with :where() so it carries zero
+ * specificity — a component that needs the ring inside its own bounds only has
+ * to restate `outline-offset`. Keyboard only: pointer users never see it.
+ */
+:where(a, button, input, textarea, select, summary, [tabindex]):focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+/* ── Keyframes ────────────────────────────────────────────────────────── */
+@keyframes pbDraw { from { transform: scaleX(0); } to { transform: scaleX(1); } }
+@keyframes pbProgress { from { width: 0; } to { width: 100%; } }
+@keyframes pbDrift { from { background-position: 0 0; } to { background-position: 0 -240px; } }
+@keyframes pbDimX { from { transform: scaleX(0); } to { transform: scaleX(1); } }
+@keyframes pbDimY { from { transform: scaleY(0); } to { transform: scaleY(1); } }
+@keyframes pbFadeIn { from { opacity: 0; } to { opacity: 1; } }
+@keyframes pbDimXReady { from { transform: scaleX(0); } to { transform: scaleX(1); } }
+@keyframes pbDimYReady { from { transform: scaleY(0); } to { transform: scaleY(1); } }
+@keyframes pbFadeInReady { from { opacity: 0; } to { opacity: 1; } }
+@keyframes pbSettle { from { opacity: 0.25; transform: translateY(20px); } to { opacity: 1; transform: none; } }
+@keyframes pbStroke { from { stroke-dashoffset: 1; } to { stroke-dashoffset: 0; } }
+@keyframes pbIntroUp { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: none; } }
+@keyframes pbIntroWipe {
+  from { opacity: 0; clip-path: inset(0 100% 0 0); transform: translateY(10px); }
+  40% { opacity: 1; }
+  to { opacity: 1; clip-path: inset(0 0 0 0); transform: none; }
+}
+@keyframes pbInDown { from { opacity: 0; transform: translateY(-170px); } to { opacity: 1; transform: none; } }
+@keyframes pbInUp { from { opacity: 0; transform: translateY(170px); } to { opacity: 1; transform: none; } }
+@keyframes pbInLeft { from { opacity: 0; transform: translateX(-190px); } to { opacity: 1; transform: none; } }
+@keyframes pbInRight { from { opacity: 0; transform: translateX(190px); } to { opacity: 1; transform: none; } }
+@keyframes pbInPop { from { opacity: 0; transform: scale(0.6); } to { opacity: 1; transform: none; } }
+@keyframes pbAnno { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: none; } }
+@keyframes pbUiIn { from { opacity: 0; transform: scale(0.985); } to { opacity: 0.82; transform: none; } }
+@keyframes pbRecede { from { opacity: 1; } to { opacity: 0.3; } }
+@keyframes pbBreathe { 0%, 100% { stroke-dashoffset: 0; } 50% { stroke-dashoffset: 0.45; } }
+@keyframes pbCrossDrift {
+  0%, 100% { transform: translate(0, 0); }
+  33% { transform: translate(4px, -3px); }
+  66% { transform: translate(-3px, 3px); }
+}
+@keyframes pbNudge { 0%, 100% { transform: translateX(0); } 50% { transform: translateX(2.5px); } }
+@keyframes pbPulse { 0%, 100% { opacity: 0.32; } 50% { opacity: 0.7; } }
+@keyframes pbTitleExit { from { opacity: 1; transform: translateY(0); } to { opacity: 0.28; transform: translateY(-22px); } }
+@keyframes pbLive {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(53, 217, 139, 0.5); }
+  70% { box-shadow: 0 0 0 6px rgba(53, 217, 139, 0); }
+}
+@keyframes pbPlate {
+  from { opacity: 0; transform: translateY(40px) scale(0.978); -webkit-mask-position: 100% 0%; mask-position: 100% 0%; }
+  12% { opacity: 1; }
+  to { opacity: 1; transform: none; -webkit-mask-position: 0% 100%; mask-position: 0% 100%; }
+}
+
+/* ── Scroll-driven plate reveal (progressive enhancement) ─────────────── */
+.plate-grid { view-timeline-name: --pbWork; view-timeline-axis: block; }
+
+.plate {
+  -webkit-mask-image: linear-gradient(45deg, #000 0 46%, rgba(0, 0, 0, 0) 54% 100%);
+  mask-image: linear-gradient(45deg, #000 0 46%, rgba(0, 0, 0, 0) 54% 100%);
+  -webkit-mask-size: 220% 220%;
+  mask-size: 220% 220%;
+  -webkit-mask-position: 0% 100%;
+  mask-position: 0% 100%;
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  animation-name: pbPlate;
+  animation-timing-function: cubic-bezier(0.2, 0.75, 0.25, 1);
+  animation-fill-mode: both;
+  animation-duration: auto;
+  animation-timeline: --pbWork;
+  animation-range: entry 6% entry 20%;
+}
+.plate:nth-of-type(2) { animation-range: entry 21% entry 35%; }
+.plate:nth-of-type(3) { animation-range: entry 36% entry 50%; }
+.plate:nth-of-type(4) { animation-range: entry 51% entry 65%; }
+.plate:nth-of-type(5) { animation-range: entry 66% entry 80%; }
+.plate:nth-of-type(6) { animation-range: entry 81% entry 95%; }
+
+@supports not (animation-timeline: view()) {
+  .plate { animation: none !important; -webkit-mask-image: none; mask-image: none; }
+  [data-title-exit] { animation: none !important; }
+}
+@supports not (animation-timeline: scroll()) {
+  [data-scroll-plot] { display: none !important; }
+}
+
+/* ── Dimension rulers ─────────────────────────────────────────────────── */
+[data-dim-val]::after { content: attr(data-px); }
+[data-dim] > span { transform-origin: center; }
+[data-dim-ready] [data-dimline] {
+  transform-origin: center !important;
+  animation-timeline: auto !important;
+  animation-range: normal !important;
+}
+[data-dim-ready] [data-dimline="x"] { animation: pbDimXReady 1.375s linear forwards !important; }
+[data-dim-ready] [data-dimline="y"] { animation: pbDimYReady 1.375s linear forwards !important; }
+[data-dim-ready] [data-dimtick] {
+  animation: pbFadeInReady 0.35s linear 1.375s forwards !important;
+  animation-timeline: auto !important;
+  animation-range: normal !important;
+}
+
+/* ── Thin scrollbar ───────────────────────────────────────────────────── */
+[data-thin-scroll] { scrollbar-width: thin; scrollbar-color: var(--rule-mid) transparent; }
+[data-thin-scroll]::-webkit-scrollbar { width: 4px; }
+[data-thin-scroll]::-webkit-scrollbar-track { background: transparent; }
+[data-thin-scroll]::-webkit-scrollbar-thumb { background: var(--rule-mid); }
+[data-thin-scroll]:hover::-webkit-scrollbar-thumb { background: rgba(150, 180, 205, 0.45); }
+
+/* ── Reduced motion ───────────────────────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  [data-motion="auto"] *,
+  [data-motion="auto"] *::before,
+  [data-motion="auto"] *::after { animation: none !important; }
+  [data-motion="auto"] [data-hero-art] { opacity: 1 !important; }
+  [data-motion="auto"] [data-intro],
+  [data-motion="auto"] [data-title-exit],
+  [data-motion="auto"] .plate { opacity: 1 !important; transform: none !important; clip-path: none; }
+  [data-motion="auto"] .plate {
+    -webkit-mask-image: none !important;
+    mask-image: none !important;
+    clip-path: polygon(0 0, calc(100% - 16px) 0, 100% 16px, 100% 100%, 0 100%);
+  }
+  [data-motion="auto"] [data-dim] > span { opacity: 1 !important; }
+  [data-motion="auto"] [data-dim] > span:nth-child(2),
+  [data-motion="auto"] [data-dim] > span:nth-child(4) { transform: none !important; }
+  [data-motion="auto"] [data-scroll-plot] { display: none !important; }
+}
+
+/* ── Print ────────────────────────────────────────────────────────────── */
+@media print {
+  [data-noprint] { display: none !important; }
+  html, body { background: #fff; }
+}

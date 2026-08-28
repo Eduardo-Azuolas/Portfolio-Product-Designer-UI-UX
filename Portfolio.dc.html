@@ -1,0 +1,1233 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  html, body { margin:0; padding:0; background:#080D13; }
+  body { font-family:'Space Grotesk', Helvetica, sans-serif; -webkit-font-smoothing:antialiased; }
+  * { box-sizing:border-box; }
+  a { color:#3FD0FF; text-decoration:none; }
+  a:hover { color:#8FE4FF; }
+  ::selection { background:rgba(63,208,255,.26); }
+  @keyframes pbDraw { from { transform:scaleX(0); } to { transform:scaleX(1); } }
+  @keyframes pbProgress { from { width:0; } to { width:100%; } }
+  @keyframes pbDrift { from { background-position:0 0; } to { background-position:0 -240px; } }
+  @keyframes pbDimX { from { transform:scaleX(0); } to { transform:scaleX(1); } }
+  @keyframes pbDimY { from { transform:scaleY(0); } to { transform:scaleY(1); } }
+  @keyframes pbFadeIn { from { opacity:0; } to { opacity:1; } }
+  @keyframes pbDimXReady { from { transform:scaleX(0); } to { transform:scaleX(1); } }
+  @keyframes pbDimYReady { from { transform:scaleY(0); } to { transform:scaleY(1); } }
+  @keyframes pbFadeInReady { from { opacity:0; } to { opacity:1; } }
+  @keyframes pbSettle { from { opacity:.25; transform:translateY(20px); } to { opacity:1; transform:none; } }
+  @keyframes pbStroke { from { stroke-dashoffset:1; } to { stroke-dashoffset:0; } }
+  @keyframes pbIntroUp { from { opacity:0; transform:translateY(14px); } to { opacity:1; transform:none; } }
+  @keyframes pbIntroWipe { from { opacity:0; clip-path:inset(0 100% 0 0); transform:translateY(10px); } 40% { opacity:1; } to { opacity:1; clip-path:inset(0 0 0 0); transform:none; } }
+  @keyframes pbDrop { from { opacity:0; transform:translateY(-46px); } to { opacity:1; transform:none; } }
+  @keyframes pbRise { from { opacity:0; transform:translateY(46px); } to { opacity:1; transform:none; } }
+  @keyframes pbSlide { from { opacity:0; transform:translateX(-34px); } to { opacity:1; transform:none; } }
+  @keyframes pbInDown { from { opacity:0; transform:translateY(-170px); } to { opacity:1; transform:none; } }
+  @keyframes pbInUp { from { opacity:0; transform:translateY(170px); } to { opacity:1; transform:none; } }
+  @keyframes pbInLeft { from { opacity:0; transform:translateX(-190px); } to { opacity:1; transform:none; } }
+  @keyframes pbInRight { from { opacity:0; transform:translateX(190px); } to { opacity:1; transform:none; } }
+  @keyframes pbPlate {
+    from { opacity:0; transform:translateY(40px) scale(.978); -webkit-mask-position:100% 0%; mask-position:100% 0%; }
+    12%  { opacity:1; }
+    to   { opacity:1; transform:none; -webkit-mask-position:0% 100%; mask-position:0% 100%; }
+  }
+  article[data-plate] {
+    -webkit-mask-image:linear-gradient(45deg, #000 0 46%, rgba(0,0,0,0) 54% 100%);
+    mask-image:linear-gradient(45deg, #000 0 46%, rgba(0,0,0,0) 54% 100%);
+    -webkit-mask-size:220% 220%; mask-size:220% 220%;
+    -webkit-mask-position:0% 100%; mask-position:0% 100%;
+    -webkit-mask-repeat:no-repeat; mask-repeat:no-repeat;
+    animation-name:pbPlate; animation-timing-function:cubic-bezier(.2,.75,.25,1); animation-fill-mode:both;
+    animation-duration:auto; animation-timeline:--pbWork;
+    animation-range:entry 6% entry 20%;
+  }
+  [data-plate-grid] { view-timeline-name:--pbWork; view-timeline-axis:block; }
+  article[data-plate]:nth-of-type(2) { animation-range:entry 21% entry 35%; }
+  article[data-plate]:nth-of-type(3) { animation-range:entry 36% entry 50%; }
+  article[data-plate]:nth-of-type(4) { animation-range:entry 51% entry 65%; }
+  article[data-plate]:nth-of-type(5) { animation-range:entry 66% entry 80%; }
+  article[data-plate]:nth-of-type(6) { animation-range:entry 81% entry 95%; }
+  @supports not (animation-timeline: view()) {
+    article[data-plate] { animation:none !important; -webkit-mask-image:none; mask-image:none; }
+  }
+  @keyframes pbInPop { from { opacity:0; transform:scale(.6); } to { opacity:1; transform:none; } }
+  @keyframes pbAnno { from { opacity:0; transform:translateY(5px); } to { opacity:1; transform:none; } }
+  @keyframes pbUiIn { from { opacity:0; transform:scale(.985); } to { opacity:.82; transform:none; } }
+  @keyframes pbRecede { from { opacity:1; } to { opacity:.3; } }
+  @keyframes pbBreathe { 0%,100% { stroke-dashoffset:0; } 50% { stroke-dashoffset:.45; } }
+  @keyframes pbCrossDrift { 0%,100% { transform:translate(0,0); } 33% { transform:translate(4px,-3px); } 66% { transform:translate(-3px,3px); } }
+  @keyframes pbNudge { 0%,100% { transform:translateX(0); } 50% { transform:translateX(2.5px); } }
+  @keyframes pbPulse { 0%,100% { opacity:.32; } 50% { opacity:.7; } }
+  @keyframes pbTitleExit { from { opacity:1; transform:translateY(0); } to { opacity:.28; transform:translateY(-22px); } }
+  @media (prefers-reduced-motion: reduce) {
+    [data-motion="auto"] *, [data-motion="auto"] *::before, [data-motion="auto"] *::after { animation:none !important; }
+    [data-motion="auto"] [data-hero-art] { opacity:1 !important; }
+    [data-motion="auto"] [data-intro], [data-motion="auto"] [data-title-exit], [data-motion="auto"] [data-plate] { opacity:1 !important; transform:none !important; clip-path:none; }
+    [data-motion="auto"] [data-plate] { -webkit-mask-image:none !important; mask-image:none !important; clip-path:polygon(0 0, calc(100% - 16px) 0, 100% 16px, 100% 100%, 0 100%); }
+    [data-motion="auto"] [data-dim] > span { opacity:1 !important; }
+    [data-motion="auto"] [data-dim] > span:nth-child(2), [data-motion="auto"] [data-dim] > span:nth-child(4) { transform:none !important; }
+    [data-motion="auto"] [data-scroll-plot] { display:none !important; }
+    [data-motion="auto"] [data-live-dot] { animation:pbLive 2s ease-out infinite !important; }
+  }
+  @supports not (animation-timeline: scroll()) { [data-scroll-plot] { display:none !important; } }
+  @supports not (animation-timeline: view()) { [data-title-exit] { animation:none !important; } }
+  @keyframes pbBlink { 0%,60%{opacity:1} 61%,100%{opacity:.25} }
+  @keyframes pbLive { 0%,100% { box-shadow:0 0 0 0 rgba(53,217,139,.5); } 70% { box-shadow:0 0 0 6px rgba(53,217,139,0); } }
+  [data-dim-val]::after { content:attr(data-px); }
+  [data-dim] > span { transform-origin:center; }
+  [data-dim-ready] [data-dimline] { transform-origin:center !important; animation-timeline:auto !important; animation-range:normal !important; }
+  [data-dim-ready] [data-dimline="x"] { animation:pbDimXReady 1.375s linear forwards !important; }
+  [data-dim-ready] [data-dimline="y"] { animation:pbDimYReady 1.375s linear forwards !important; }
+  [data-dim-ready] [data-dimtick] { animation:pbFadeInReady .35s linear 1.375s forwards !important; animation-timeline:auto !important; animation-range:normal !important; }
+  [data-thin-scroll] { scrollbar-width:thin; scrollbar-color:rgba(150,180,205,.28) transparent; }
+  [data-thin-scroll]::-webkit-scrollbar { width:4px; }
+  [data-thin-scroll]::-webkit-scrollbar-track { background:transparent; }
+  [data-thin-scroll]::-webkit-scrollbar-thumb { background:rgba(150,180,205,.28); }
+  [data-thin-scroll]:hover::-webkit-scrollbar-thumb { background:rgba(150,180,205,.45); }
+  @media print { [data-noprint] { display:none !important; } html,body{background:#fff} }
+</style>
+</helmet>
+
+<div data-motion="{{ motionMode }}" style="position:relative; min-height:100vh; background:#080D13; color:#EDF4FA; overflow-x:clip;">
+
+  <div data-noprint data-scroll-plot style="position:fixed; top:0; left:0; height:2px; width:0; z-index:45; background:#3FD0FF; animation:pbProgress linear both; animation-duration:auto; animation-timeline:scroll(root);"></div>
+  <div style="position:fixed; inset:-10px; pointer-events:none; z-index:0; background-image:linear-gradient(rgba(150,180,205,.055) 1px, transparent 1px), linear-gradient(90deg, rgba(150,180,205,.055) 1px, transparent 1px); background-size:16px 16px; transform:translate(calc(var(--pbx,0) * 3px), calc(var(--pby,0) * 3px)); transition:transform 1.2s cubic-bezier(.2,.7,.2,1); animation:pbDrift linear both; animation-duration:auto; animation-timeline:scroll(root);"></div>
+  <div style="position:fixed; inset:-10px; pointer-events:none; z-index:0; background-image:linear-gradient(rgba(150,180,205,.13) 1px, transparent 1px), linear-gradient(90deg, rgba(150,180,205,.13) 1px, transparent 1px); background-size:80px 80px; transform:translate(calc(var(--pbx,0) * 4px), calc(var(--pby,0) * 4px)); transition:transform 1.2s cubic-bezier(.2,.7,.2,1); animation:pbDrift linear both; animation-duration:auto; animation-timeline:scroll(root);"></div>
+  <div style="position:fixed; inset:0; pointer-events:none; z-index:0; background:radial-gradient(ellipse 100% 52% at 50% -6%, rgba(63,208,255,.07), transparent 72%), linear-gradient(180deg, transparent 45%, rgba(4,8,13,.5));"></div>
+
+
+  <header data-noprint style="position:fixed; top:0; left:0; right:0; z-index:40; backdrop-filter:blur(10px); background:rgba(8,13,19,.86); border-bottom:1px solid rgba(150,180,205,.16);">
+    <div style="max-width:1280px; margin:0 auto; padding:14px 24px; display:flex; align-items:center; gap:24px;">
+      <div onClick="{{ goHome }}" style="cursor:pointer; display:flex; align-items:baseline; gap:10px; min-width:0;">
+        <span style="font-size:15px; font-weight:600; letter-spacing:-.01em; white-space:nowrap;">{{ name }}</span>
+        <span style="font-family:'IBM Plex Mono',monospace; font-size:10px; letter-spacing:.14em; color:#7A8DA0; white-space:nowrap;">SHEET 01/05</span>
+      </div>
+      <div style="flex:1"></div>
+      <nav style="display:flex; align-items:center; gap:4px;">
+        <sc-for list="{{ navItems }}" as="it" hint-placeholder-count="4">
+          <button onClick="{{ it.go }}" style="appearance:none; background:transparent; border:0; cursor:pointer; font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:.12em; padding:10px 12px; min-height:44px; color:{{ it.color }};" style-hover="color:#8FE4FF">{{ it.label }}</button>
+        </sc-for>
+      </nav>
+      <div style="display:flex; align-items:stretch; border:1px solid rgba(150,180,205,.28); height:32px;">
+        <button onClick="{{ setEn }}" style="appearance:none; border:0; cursor:pointer; padding:0 10px; font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:.1em; background:{{ enBg }}; color:{{ enFg }};">EN</button>
+        <button onClick="{{ setPt }}" style="appearance:none; border:0; border-left:1px solid rgba(150,180,205,.28); cursor:pointer; padding:0 10px; font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:.1em; background:{{ ptBg }}; color:{{ ptFg }};">PT</button>
+      </div>
+    </div>
+  </header>
+
+  <sc-if value="{{ isHome }}" hint-placeholder-val="{{ true }}">
+  <main data-screen-label="Home" style="position:relative; z-index:1; max-width:1280px; margin:0 auto; padding:0 24px 120px;">
+
+    <section style="position:relative; padding:150px 0 90px; min-height:88vh; display:flex; flex-direction:column; justify-content:center;">
+      <div data-noprint data-hero-art aria-hidden="true" style="display:{{ heroArtDisplay }}; position:absolute; left:700px; right:-56px; top:50%; height:min(74vh,620px); transform:translateY(-50%); pointer-events:none; z-index:0; opacity:{{ heroArtOpacity }};">
+        <svg viewBox="0 0 520 520" fill="none" preserveAspectRatio="xMidYMid meet" style="display:block; width:100%; height:100%;">
+          <g style="transform:translate(calc(var(--pbx,0) * -6px), calc(var(--pby,0) * -5px)); transition:transform 1s cubic-bezier(.2,.7,.2,1);">
+
+            <path d="M120,120 H376" pathLength="1" stroke="rgba(150,180,205,.46)" stroke-width="1" stroke-dasharray="1" style="animation-name:pbStroke, pbInDown; animation-duration:0.7s, .95s; animation-delay:0.1s, 0.1s; animation-timing-function:cubic-bezier(.62,.03,.3,1), cubic-bezier(.16,.84,.3,1); animation-fill-mode:both, both;"/>
+            <path d="M400,144 V400" pathLength="1" stroke="rgba(150,180,205,.46)" stroke-width="1" stroke-dasharray="1" style="animation-name:pbStroke, pbInRight; animation-duration:0.7s, .95s; animation-delay:0.28s, 0.28s; animation-timing-function:cubic-bezier(.62,.03,.3,1), cubic-bezier(.16,.84,.3,1); animation-fill-mode:both, both;"/>
+            <path d="M400,400 H120" pathLength="1" stroke="rgba(150,180,205,.46)" stroke-width="1" stroke-dasharray="1" style="animation-name:pbStroke, pbInUp; animation-duration:0.7s, .95s; animation-delay:0.16s, 0.16s; animation-timing-function:cubic-bezier(.62,.03,.3,1), cubic-bezier(.16,.84,.3,1); animation-fill-mode:both, both;"/>
+            <path d="M120,400 V120" pathLength="1" stroke="rgba(150,180,205,.46)" stroke-width="1" stroke-dasharray="1" style="animation-name:pbStroke, pbInLeft; animation-duration:0.7s, .95s; animation-delay:0.22s, 0.22s; animation-timing-function:cubic-bezier(.62,.03,.3,1), cubic-bezier(.16,.84,.3,1); animation-fill-mode:both, both;"/>
+            <path d="M376,120 A24,24 0 0 1 400,144" pathLength="1" stroke="rgba(150,180,205,.46)" stroke-width="1" stroke-dasharray="1" style="animation-name:pbStroke, pbInRight; animation-duration:0.4s, .95s; animation-delay:0.68s, 0.68s; animation-timing-function:cubic-bezier(.62,.03,.3,1), cubic-bezier(.16,.84,.3,1); animation-fill-mode:both, both;"/>
+            <path d="M260,60 V138" pathLength="1" stroke="rgba(150,180,205,.32)" stroke-width="1" stroke-dasharray="1" style="animation-name:pbStroke, pbInDown; animation-duration:0.5s, .95s; animation-delay:0.42s, 0.42s; animation-timing-function:cubic-bezier(.62,.03,.3,1), cubic-bezier(.16,.84,.3,1); animation-fill-mode:both, both;"/>
+            <path d="M260,386 V460" pathLength="1" stroke="rgba(150,180,205,.32)" stroke-width="1" stroke-dasharray="1" style="animation-name:pbStroke, pbInUp; animation-duration:0.5s, .95s; animation-delay:0.48s, 0.48s; animation-timing-function:cubic-bezier(.62,.03,.3,1), cubic-bezier(.16,.84,.3,1); animation-fill-mode:both, both;"/>
+            <g style="transform-box:fill-box; transform-origin:center; animation:pbInPop .85s cubic-bezier(.16,.84,.3,1) .55s both;">
+              <path d="M416,300 A24,24 0 0 1 464,300 A24,24 0 0 1 416,300" pathLength="1" stroke="rgba(63,208,255,.55)" stroke-width="1" stroke-dasharray="1" style="animation:pbStroke .7s cubic-bezier(.62,.03,.3,1) .55s both;"/>
+            </g>
+
+            <g style="display:{{ heroAnnoDisplay }};">
+              <path d="M120,88 H400" pathLength="1" stroke="rgba(150,180,205,.32)" stroke-width="1" stroke-dasharray="1" style="animation-name:pbStroke, pbInLeft; animation-duration:0.55s, .95s; animation-delay:0.8s, 0.8s; animation-timing-function:cubic-bezier(.62,.03,.3,1), cubic-bezier(.16,.84,.3,1); animation-fill-mode:both, both;"/>
+              <path d="M120,80 V96" pathLength="1" stroke="rgba(150,180,205,.46)" stroke-width="1" stroke-dasharray="1" style="animation-name:pbStroke, pbInLeft; animation-duration:0.3s, .95s; animation-delay:0.9s, 0.9s; animation-timing-function:cubic-bezier(.62,.03,.3,1), cubic-bezier(.16,.84,.3,1); animation-fill-mode:both, both;"/>
+              <path d="M400,80 V96" pathLength="1" stroke="rgba(150,180,205,.46)" stroke-width="1" stroke-dasharray="1" style="animation-name:pbStroke, pbInLeft; animation-duration:0.3s, .95s; animation-delay:0.9s, 0.9s; animation-timing-function:cubic-bezier(.62,.03,.3,1), cubic-bezier(.16,.84,.3,1); animation-fill-mode:both, both;"/>
+              <text x="260" y="84" text-anchor="middle" style="font-family:'IBM Plex Mono',monospace; font-size:9px; letter-spacing:.18em; fill:#5E7386; animation:pbAnno .7s cubic-bezier(.16,.84,.3,1) 1.1s both;">A—A</text>
+              <path d="M120,432 V448" pathLength="1" stroke="rgba(150,180,205,.46)" stroke-width="1" stroke-dasharray="1" style="animation-name:pbStroke, pbInLeft; animation-duration:0.3s, .95s; animation-delay:0.95s, 0.95s; animation-timing-function:cubic-bezier(.62,.03,.3,1), cubic-bezier(.16,.84,.3,1); animation-fill-mode:both, both;"/>
+              <path d="M400,432 V448" pathLength="1" stroke="rgba(150,180,205,.46)" stroke-width="1" stroke-dasharray="1" style="animation-name:pbStroke, pbInLeft; animation-duration:0.3s, .95s; animation-delay:0.95s, 0.95s; animation-timing-function:cubic-bezier(.62,.03,.3,1), cubic-bezier(.16,.84,.3,1); animation-fill-mode:both, both;"/>
+              <path d="M120,440 H236" pathLength="1" stroke="rgba(150,180,205,.32)" stroke-width="1" stroke-dasharray="1" style="animation-name:pbStroke, pbInLeft; animation-duration:0.4s, .95s; animation-delay:1s, 1s; animation-timing-function:cubic-bezier(.62,.03,.3,1), cubic-bezier(.16,.84,.3,1); animation-fill-mode:both, both;"/>
+              <path d="M284,440 H400" pathLength="1" stroke="rgba(150,180,205,.32)" stroke-width="1" stroke-dasharray="1" style="animation-name:pbStroke, pbInLeft; animation-duration:0.4s, .95s; animation-delay:1s, 1s; animation-timing-function:cubic-bezier(.62,.03,.3,1), cubic-bezier(.16,.84,.3,1); animation-fill-mode:both, both;"/>
+              <text x="260" y="443" text-anchor="middle" style="font-family:'IBM Plex Mono',monospace; font-size:9px; letter-spacing:.18em; fill:#5E7386; animation:pbAnno .7s cubic-bezier(.16,.84,.3,1) 1.18s both;">120 mm</text>
+              <path d="M400,300 H412" pathLength="1" stroke="rgba(150,180,205,.24)" stroke-width="1" stroke-dasharray="1" style="animation-name:pbStroke, pbInRight, pbBreathe; animation-duration:.3s, .95s, 9s; animation-delay:1.28s, 1.28s, 3.4s; animation-timing-function:cubic-bezier(.62,.03,.3,1), cubic-bezier(.16,.84,.3,1), ease-in-out; animation-fill-mode:both, both, none; animation-iteration-count:1, 1, infinite;"/>
+              <text x="440" y="266" text-anchor="middle" style="font-family:'IBM Plex Mono',monospace; font-size:9px; letter-spacing:.18em; fill:#5E7386; animation:pbInRight .7s cubic-bezier(.16,.84,.3,1) 1.34s both;">Ø48</text>
+              <path d="M394,130 L440,106" pathLength="1" stroke="rgba(150,180,205,.24)" stroke-width="1" stroke-dasharray="1" style="animation-name:pbStroke, pbInRight; animation-duration:0.35s, .95s; animation-delay:1.38s, 1.38s; animation-timing-function:cubic-bezier(.62,.03,.3,1), cubic-bezier(.16,.84,.3,1); animation-fill-mode:both, both;"/>
+              <text x="444" y="104" text-anchor="start" style="font-family:'IBM Plex Mono',monospace; font-size:9px; letter-spacing:.18em; fill:#5E7386; animation:pbInRight .7s cubic-bezier(.16,.84,.3,1) 1.44s both;">R24</text>
+              <g style="animation:pbNudge 11s ease-in-out 3s infinite;">
+                <text x="132" y="144" text-anchor="start" style="font-family:'IBM Plex Mono',monospace; font-size:9px; letter-spacing:.18em; fill:#5E7386; animation:pbAnno .7s cubic-bezier(.16,.84,.3,1) 1.5s both;">01</text>
+              </g>
+            </g>
+
+            <g style="opacity:.3; animation:pbRecede .8s ease 1.75s both;">
+              <path d="M150,150 H370 V206 H150 Z" pathLength="1" stroke="rgba(150,180,205,.46)" stroke-width="1" stroke-dasharray="1" style="animation-name:pbStroke, pbInDown; animation-duration:0.7s, .95s; animation-delay:1.12s, 1.12s; animation-timing-function:cubic-bezier(.62,.03,.3,1), cubic-bezier(.16,.84,.3,1); animation-fill-mode:both, both;"/>
+              <path d="M150,222 H370 V318 H150 Z" pathLength="1" stroke="rgba(150,180,205,.46)" stroke-width="1" stroke-dasharray="1" style="animation-name:pbStroke, pbInLeft; animation-duration:0.7s, .95s; animation-delay:1.22s, 1.22s; animation-timing-function:cubic-bezier(.62,.03,.3,1), cubic-bezier(.16,.84,.3,1); animation-fill-mode:both, both;"/>
+              <path d="M150,334 H370 V374 H150 Z" pathLength="1" stroke="rgba(150,180,205,.46)" stroke-width="1" stroke-dasharray="1" style="animation-name:pbStroke, pbInUp; animation-duration:0.7s, .95s; animation-delay:1.32s, 1.32s; animation-timing-function:cubic-bezier(.62,.03,.3,1), cubic-bezier(.16,.84,.3,1); animation-fill-mode:both, both;"/>
+            </g>
+
+            <g style="pointer-events:auto; opacity:.82; animation:pbUiIn .75s cubic-bezier(.16,.84,.3,1) 1.78s both;" style-hover="opacity:1">
+              <rect x="150" y="150" width="220" height="56" rx="9" stroke="rgba(150,180,205,.55)" stroke-width="1"/>
+              <rect x="166" y="172" width="44" height="8" rx="4" fill="rgba(150,180,205,.34)"/>
+              <circle cx="332" cy="176" r="2.5" fill="rgba(150,180,205,.4)"/>
+              <circle cx="342" cy="176" r="2.5" fill="rgba(150,180,205,.4)"/>
+              <circle cx="352" cy="176" r="2.5" fill="rgba(150,180,205,.4)"/>
+              <rect x="150" y="222" width="220" height="96" rx="11" stroke="rgba(150,180,205,.55)" stroke-width="1" fill="rgba(150,180,205,.035)"/>
+              <circle cx="180" cy="252" r="11" stroke="rgba(150,180,205,.4)" stroke-width="1"/>
+              <rect x="202" y="243" width="86" height="7" rx="3.5" fill="rgba(150,180,205,.3)"/>
+              <rect x="202" y="257" width="52" height="7" rx="3.5" fill="rgba(150,180,205,.2)"/>
+              <rect x="168" y="288" width="184" height="6" rx="3" fill="rgba(150,180,205,.16)"/>
+              <rect x="150" y="334" width="116" height="40" rx="20" fill="rgba(63,208,255,.85)"/>
+              <rect x="176" y="351" width="64" height="6" rx="3" fill="#04080D"/>
+            </g>
+
+            <g style="transform:translate(calc(var(--pbx,0) * 24px), calc(var(--pby,0) * 20px)); transition:transform 1.15s cubic-bezier(.16,.84,.3,1);">
+              <g style="animation:pbCrossDrift 16s ease-in-out 3s infinite;">
+                <g style="transform-box:fill-box; transform-origin:center; opacity:.32; animation:pbInPop .7s cubic-bezier(.16,.84,.3,1) 1.9s both, pbPulse 6s ease-in-out 3s infinite;">
+                  <path d="M440,286 V314" stroke="#3FD0FF" stroke-width="1"/>
+                  <path d="M426,300 H454" stroke="#3FD0FF" stroke-width="1"/>
+                  <circle cx="440" cy="300" r="5" stroke="#3FD0FF" stroke-width="1"/>
+                </g>
+              </g>
+            </g>
+          </g>
+        </svg>
+      </div>
+
+
+      <div style="position:relative; z-index:1;">
+        <div data-intro style="display:flex; align-items:center; gap:14px; margin-bottom:26px; animation:pbIntroUp .7s cubic-bezier(.16,.84,.3,1) 1.45s both;">
+          <span style="font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:.2em; color:#3FD0FF;">FIG. 01 — {{ t.heroLabel }}</span>
+          <span data-line style="flex:1; height:1px; background:rgba(150,180,205,.3); transform-origin:left; animation:pbDraw 1.125s cubic-bezier(.2,.8,.2,1) 1.5s both;"></span><span style="width:1px; height:8px; background:rgba(150,180,205,.42);"></span>
+          <span style="font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:.14em; color:#5E7386;">X: 240 Y: 088</span>
+        </div>
+        <div data-title-exit style="position:relative; animation:pbTitleExit linear both; animation-duration:auto; animation-timeline:view(); animation-range:exit 0% exit 100%;">
+          <div data-noprint data-dim="v" style="display:{{ rulerDisplay }}; flex-direction:column; align-items:center; position:absolute; left:-34px; top:4px; bottom:4px; width:11px;"><span data-dimtick style="width:9px; height:1px; background:rgba(150,180,205,.5); flex:none; animation:pbFadeIn linear both; animation-duration:auto; animation-timeline:view(); animation-range:entry 20% cover 62%;"></span><span data-dimline="y" style="flex:1; width:1px; background:rgba(150,180,205,.34); animation:pbDimY cubic-bezier(.2,.7,.2,1) both; animation-duration:auto; animation-timeline:view(); animation-range:entry 8% cover 58%;"></span><span data-dim-val style="writing-mode:vertical-rl; transform:rotate(180deg); margin:10px 0; font-family:'IBM Plex Mono',monospace; font-size:9px; letter-spacing:.18em; color:#5E7386; white-space:nowrap;"></span><span data-dimline="y" style="flex:1; width:1px; background:rgba(150,180,205,.34); animation:pbDimY cubic-bezier(.2,.7,.2,1) both; animation-duration:auto; animation-timeline:view(); animation-range:entry 8% cover 58%;"></span><span data-dimtick style="width:9px; height:1px; background:rgba(150,180,205,.5); flex:none; animation:pbFadeIn linear both; animation-duration:auto; animation-timeline:view(); animation-range:entry 20% cover 62%;"></span></div>
+          <h1 data-intro style="margin:0; font-size:clamp(40px,7.4vw,92px); line-height:.96; font-weight:600; letter-spacing:-.035em; text-wrap:balance; animation:pbIntroWipe 1s cubic-bezier(.16,.84,.3,1) 1.6s both;">{{ name }}</h1>
+        </div>
+        <div data-intro style="margin-top:20px; display:flex; flex-wrap:wrap; gap:10px 18px; align-items:center; animation:pbIntroUp .7s cubic-bezier(.16,.84,.3,1) 1.9s both;">
+          <span style="font-family:'IBM Plex Mono',monospace; font-size:12px; letter-spacing:.14em; color:#7E97AC;">{{ t.role }}</span>
+          <span style="width:5px; height:5px; background:rgba(150,180,205,.5); transform:rotate(45deg);"></span>
+          <span style="font-family:'IBM Plex Mono',monospace; font-size:12px; letter-spacing:.14em; color:#7A8DA0;">{{ t.based }}</span>
+        </div>
+        <p data-intro style="margin:38px 0 0; max-width:660px; font-size:clamp(19px,2.1vw,25px); line-height:1.46; color:#BCD3E4; text-wrap:pretty; animation:pbIntroUp .7s cubic-bezier(.16,.84,.3,1) 2s both;">{{ t.valueProp }}</p>
+        <div data-intro data-noprint data-dim="h" style="max-width:660px; margin-top:18px; display:flex; align-items:center; gap:0; animation:pbIntroUp .7s cubic-bezier(.16,.84,.3,1) 2.1s both;">
+          <span data-dimtick style="width:1px; height:9px; background:rgba(150,180,205,.5); animation:pbFadeIn linear both; animation-duration:auto; animation-timeline:view(); animation-range:entry 20% cover 62%;"></span>
+          <span data-dimline="x" style="flex:1; height:1px; background:rgba(150,180,205,.34); animation:pbDimX cubic-bezier(.2,.7,.2,1) both; animation-duration:auto; animation-timeline:view(); animation-range:entry 8% cover 58%;"></span>
+          <span data-dim-val style="margin:0 10px; font-family:'IBM Plex Mono',monospace; font-size:9px; letter-spacing:.18em; color:#5E7386; white-space:nowrap;"></span>
+          <span data-dimline="x" style="flex:1; height:1px; background:rgba(150,180,205,.34); animation:pbDimX cubic-bezier(.2,.7,.2,1) both; animation-duration:auto; animation-timeline:view(); animation-range:entry 8% cover 58%;"></span>
+          <span data-dimtick style="width:1px; height:9px; background:rgba(150,180,205,.5); animation:pbFadeIn linear both; animation-duration:auto; animation-timeline:view(); animation-range:entry 20% cover 62%;"></span>
+        </div>
+        <div data-intro style="margin-top:40px; display:flex; flex-wrap:wrap; gap:12px; animation:pbIntroUp .7s cubic-bezier(.16,.84,.3,1) 2.2s both;">
+          <button onClick="{{ goResume }}" style="appearance:none; cursor:pointer; background:#3FD0FF; color:#04080D; border:0; padding:0 26px; min-height:48px; font-family:'IBM Plex Mono',monospace; font-size:12px; letter-spacing:.14em;" style-hover="background:#8FE4FF">{{ t.ctaResume }}</button>
+          <button onClick="{{ goContact }}" style="appearance:none; cursor:pointer; background:transparent; color:#EDF4FA; border:1px solid rgba(150,180,205,.4); padding:0 26px; min-height:48px; font-family:'IBM Plex Mono',monospace; font-size:12px; letter-spacing:.14em;" style-hover="border-color:#7E97AC; color:#8FE4FF">{{ t.ctaContact }}</button>
+        </div>
+      </div>
+    </section>
+
+    <section data-reveal style="opacity:0; transform:translateY(14px); transition:opacity .7s ease, transform .7s cubic-bezier(.2,.7,.2,1); padding:40px 0 20px;">
+      <div style="display:flex; align-items:center; gap:14px; margin-bottom:34px;">
+        <span style="font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:.2em; color:#7E97AC;">FIG. 02 — {{ t.workLabel }}</span>
+        <span data-line style="flex:1; height:1px; background:rgba(150,180,205,.3); transform-origin:left;"></span><span style="width:1px; height:8px; background:rgba(150,180,205,.42);"></span>
+        <span style="font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:.14em; color:#5E7386;">06 {{ t.sheets }}</span>
+      </div>
+      <sc-if value="{{ isPlates }}" hint-placeholder-val="{{ true }}">
+      <div data-plate-grid style="position:relative; display:grid; grid-template-columns:{{ cardCols }}; gap:22px;">
+        <div data-noprint data-dim="v" style="display:{{ rulerDisplay }}; flex-direction:column; align-items:center; position:absolute; left:-34px; top:4px; bottom:4px; width:11px;"><span data-dimtick style="width:9px; height:1px; background:rgba(150,180,205,.5); flex:none; animation:pbFadeIn linear both; animation-duration:auto; animation-timeline:view(); animation-range:entry 20% cover 62%;"></span><span data-dimline="y" style="flex:1; width:1px; background:rgba(150,180,205,.34); animation:pbDimY cubic-bezier(.2,.7,.2,1) both; animation-duration:auto; animation-timeline:view(); animation-range:entry 8% cover 58%;"></span><span data-dim-val style="writing-mode:vertical-rl; transform:rotate(180deg); margin:10px 0; font-family:'IBM Plex Mono',monospace; font-size:9px; letter-spacing:.18em; color:#5E7386; white-space:nowrap;"></span><span data-dimline="y" style="flex:1; width:1px; background:rgba(150,180,205,.34); animation:pbDimY cubic-bezier(.2,.7,.2,1) both; animation-duration:auto; animation-timeline:view(); animation-range:entry 8% cover 58%;"></span><span data-dimtick style="width:9px; height:1px; background:rgba(150,180,205,.5); flex:none; animation:pbFadeIn linear both; animation-duration:auto; animation-timeline:view(); animation-range:entry 20% cover 62%;"></span></div>
+        <sc-for list="{{ cards }}" as="c" hint-placeholder-count="6">
+          <article onClick="{{ c.go }}" data-plate style="transition:background .25s ease, border-color .25s ease; cursor:pointer; background:#0A1017; border:1px solid rgba(150,180,205,.22); clip-path:polygon(0 0, calc(100% - 16px) 0, 100% 16px, 100% 100%, 0 100%); padding:22px 22px 0; position:relative; min-height:268px; display:flex; flex-direction:column;" style-hover="background:#0D1621; border-color:rgba(63,208,255,.45)">
+            <span style="position:absolute; top:1px; right:1px; width:22px; height:22px; pointer-events:none; background:linear-gradient(to bottom left, transparent calc(50% - 1px), rgba(150,180,205,.4) 50%, transparent calc(50% + .6px));"></span>
+            <div style="font-family:'IBM Plex Mono',monospace; font-size:10px; letter-spacing:.14em; color:#9FC2DC;">{{ c.kind }}</div>
+            <div data-line style="height:1px; background:rgba(150,180,205,.14); margin:14px 0 18px; transform-origin:left;"></div>
+            <h3 style="margin:0; font-size:26px; font-weight:600; letter-spacing:-.02em; text-wrap:pretty;">{{ c.name }}</h3>
+            <p style="margin:14px 0 0; font-size:14.5px; line-height:1.55; color:#93A6B8; text-wrap:pretty;">{{ c.line }}</p>
+            <div style="flex:1; min-height:20px;"></div>
+            <div style="margin:0 -22px; border-top:1px solid rgba(150,180,205,.22); display:grid; grid-template-columns:1fr 1fr 1.3fr; font-family:'IBM Plex Mono',monospace; font-size:9.5px; letter-spacing:.14em;">
+              <span style="padding:13px 8px 13px 22px; color:#5E7386;">SPEC-{{ c.code }}</span>
+              <span style="padding:13px 8px; border-left:1px solid rgba(150,180,205,.16); color:#5E7386;">{{ c.year }}</span>
+              <span style="padding:13px 22px 13px 12px; border-left:1px solid rgba(150,180,205,.16); color:#3FD0FF; text-align:right;">{{ t.openSheet }}</span>
+            </div>
+          </article>
+        </sc-for>
+      </div>
+      </sc-if>
+
+      <sc-if value="{{ isBound }}">
+      <div style="position:relative; display:grid; grid-template-columns:{{ cardCols }}; gap:1px; background:rgba(150,180,205,.16); border:1px solid rgba(150,180,205,.16);">
+        <div data-noprint data-dim="v" style="display:{{ rulerDisplay }}; flex-direction:column; align-items:center; position:absolute; left:-34px; top:4px; bottom:4px; width:11px;"><span data-dimtick style="width:9px; height:1px; background:rgba(150,180,205,.5); flex:none; animation:pbFadeIn linear both; animation-duration:auto; animation-timeline:view(); animation-range:entry 20% cover 62%;"></span><span data-dimline="y" style="flex:1; width:1px; background:rgba(150,180,205,.34); animation:pbDimY cubic-bezier(.2,.7,.2,1) both; animation-duration:auto; animation-timeline:view(); animation-range:entry 8% cover 58%;"></span><span data-dim-val style="writing-mode:vertical-rl; transform:rotate(180deg); margin:10px 0; font-family:'IBM Plex Mono',monospace; font-size:9px; letter-spacing:.18em; color:#5E7386; white-space:nowrap;"></span><span data-dimline="y" style="flex:1; width:1px; background:rgba(150,180,205,.34); animation:pbDimY cubic-bezier(.2,.7,.2,1) both; animation-duration:auto; animation-timeline:view(); animation-range:entry 8% cover 58%;"></span><span data-dimtick style="width:9px; height:1px; background:rgba(150,180,205,.5); flex:none; animation:pbFadeIn linear both; animation-duration:auto; animation-timeline:view(); animation-range:entry 20% cover 62%;"></span></div>
+        <sc-for list="{{ cards }}" as="c" hint-placeholder-count="6">
+          <article onClick="{{ c.go }}" data-reveal style="opacity:0; transform:translateY(14px); transition:opacity .6s ease, transform .6s cubic-bezier(.2,.7,.2,1), background .25s ease; cursor:pointer; background:#0C121A; padding:26px 24px 24px; position:relative; min-height:250px; display:flex; flex-direction:column;" style-hover="background:#101A26">
+            <div style="display:flex; justify-content:space-between; align-items:baseline; font-family:'IBM Plex Mono',monospace; font-size:10px; letter-spacing:.16em; color:#5E7386;">
+              <span>SPEC-{{ c.code }}</span>
+              <span>{{ c.year }}</span>
+            </div>
+            <div data-line style="height:1px; background:rgba(150,180,205,.14); margin:16px 0 18px; transform-origin:left;"></div>
+            <h3 style="margin:0; font-size:26px; font-weight:600; letter-spacing:-.02em;">{{ c.name }}</h3>
+            <div style="margin-top:8px; font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:.1em; color:#9FC2DC;">{{ c.kind }}</div>
+            <p style="margin:16px 0 0; font-size:14.5px; line-height:1.55; color:#93A6B8; text-wrap:pretty;">{{ c.line }}</p>
+            <div style="flex:1"></div>
+            <div style="margin-top:20px; display:flex; align-items:center; gap:10px;">
+              <span data-line style="flex:1; border-top:1px dashed rgba(150,180,205,.32); transform-origin:left;"></span>
+              <span style="font-family:'IBM Plex Mono',monospace; font-size:10px; letter-spacing:.16em; color:#3FD0FF;">{{ t.openSheet }}</span>
+            </div>
+          </article>
+        </sc-for>
+      </div>
+      </sc-if>
+      <div data-noprint data-dim="h" style="margin-top:14px; display:flex; align-items:center; gap:0;">
+  <span data-dimtick style="width:1px; height:9px; background:rgba(150,180,205,.5); animation:pbFadeIn linear both; animation-duration:auto; animation-timeline:view(); animation-range:entry 20% cover 62%;"></span>
+  <span data-dimline="x" style="flex:1; height:1px; background:rgba(150,180,205,.34); animation:pbDimX cubic-bezier(.2,.7,.2,1) both; animation-duration:auto; animation-timeline:view(); animation-range:entry 8% cover 58%;"></span>
+  <span data-dim-val style="margin:0 10px; font-family:'IBM Plex Mono',monospace; font-size:9px; letter-spacing:.18em; color:#5E7386; white-space:nowrap;"></span>
+  <span data-dimline="x" style="flex:1; height:1px; background:rgba(150,180,205,.34); animation:pbDimX cubic-bezier(.2,.7,.2,1) both; animation-duration:auto; animation-timeline:view(); animation-range:entry 8% cover 58%;"></span>
+  <span data-dimtick style="width:1px; height:9px; background:rgba(150,180,205,.5); animation:pbFadeIn linear both; animation-duration:auto; animation-timeline:view(); animation-range:entry 20% cover 62%;"></span>
+</div>
+    </section>
+
+    <section data-reveal style="opacity:0; transform:translateY(14px); transition:opacity .7s ease, transform .7s cubic-bezier(.2,.7,.2,1); padding:96px 0 20px;">
+      <div style="display:flex; align-items:center; gap:14px; margin-bottom:34px;">
+        <span style="font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:.2em; color:#7E97AC;">FIG. 03 — {{ t.philLabel }}</span>
+        <span data-line style="flex:1; height:1px; background:rgba(150,180,205,.3); transform-origin:left;"></span><span style="width:1px; height:8px; background:rgba(150,180,205,.42);"></span>
+      </div>
+      <p style="margin:0; max-width:900px; font-size:clamp(21px,2.6vw,32px); line-height:1.36; font-weight:500; letter-spacing:-.02em; color:#EDF4FA; text-wrap:pretty;">{{ t.philosophy }}</p>
+      <div data-noprint data-dim="h" style="max-width:900px; margin-top:18px; display:flex; align-items:center; gap:0;">
+  <span data-dimtick style="width:1px; height:9px; background:rgba(150,180,205,.5); animation:pbFadeIn linear both; animation-duration:auto; animation-timeline:view(); animation-range:entry 20% cover 62%;"></span>
+  <span data-dimline="x" style="flex:1; height:1px; background:rgba(150,180,205,.34); animation:pbDimX cubic-bezier(.2,.7,.2,1) both; animation-duration:auto; animation-timeline:view(); animation-range:entry 8% cover 58%;"></span>
+  <span data-dim-val style="margin:0 10px; font-family:'IBM Plex Mono',monospace; font-size:9px; letter-spacing:.18em; color:#5E7386; white-space:nowrap;"></span>
+  <span data-dimline="x" style="flex:1; height:1px; background:rgba(150,180,205,.34); animation:pbDimX cubic-bezier(.2,.7,.2,1) both; animation-duration:auto; animation-timeline:view(); animation-range:entry 8% cover 58%;"></span>
+  <span data-dimtick style="width:1px; height:9px; background:rgba(150,180,205,.5); animation:pbFadeIn linear both; animation-duration:auto; animation-timeline:view(); animation-range:entry 20% cover 62%;"></span>
+</div>
+      <p style="margin:24px 0 0; max-width:680px; font-size:16px; line-height:1.6; color:#93A6B8; text-wrap:pretty;">{{ t.philosophySub }}</p>
+    </section>
+
+    <section data-reveal style="opacity:0; transform:translateY(14px); transition:opacity .7s ease, transform .7s cubic-bezier(.2,.7,.2,1); position:relative; margin-top:96px; border:1px solid rgba(150,180,205,.22); padding:48px 32px; display:flex; flex-wrap:wrap; gap:24px; align-items:center; justify-content:space-between;">
+      <div data-noprint data-dim="v" style="display:{{ rulerDisplay }}; flex-direction:column; align-items:center; position:absolute; left:-34px; top:4px; bottom:4px; width:11px;"><span data-dimtick style="width:9px; height:1px; background:rgba(150,180,205,.5); flex:none; animation:pbFadeIn linear both; animation-duration:auto; animation-timeline:view(); animation-range:entry 20% cover 62%;"></span><span data-dimline="y" style="flex:1; width:1px; background:rgba(150,180,205,.34); animation:pbDimY cubic-bezier(.2,.7,.2,1) both; animation-duration:auto; animation-timeline:view(); animation-range:entry 8% cover 58%;"></span><span data-dim-val style="writing-mode:vertical-rl; transform:rotate(180deg); margin:10px 0; font-family:'IBM Plex Mono',monospace; font-size:9px; letter-spacing:.18em; color:#5E7386; white-space:nowrap;"></span><span data-dimline="y" style="flex:1; width:1px; background:rgba(150,180,205,.34); animation:pbDimY cubic-bezier(.2,.7,.2,1) both; animation-duration:auto; animation-timeline:view(); animation-range:entry 8% cover 58%;"></span><span data-dimtick style="width:9px; height:1px; background:rgba(150,180,205,.5); flex:none; animation:pbFadeIn linear both; animation-duration:auto; animation-timeline:view(); animation-range:entry 20% cover 62%;"></span></div>
+      <div>
+        <div style="font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:.18em; color:#7E97AC; margin-bottom:12px;">{{ t.ctaLabel }}</div>
+        <h3 style="margin:0; font-size:clamp(24px,3vw,34px); font-weight:600; letter-spacing:-.025em;">{{ t.ctaHeading }}</h3>
+      </div>
+      <button onClick="{{ goContact }}" style="appearance:none; cursor:pointer; background:#3FD0FF; color:#04080D; border:0; padding:0 30px; min-height:52px; font-family:'IBM Plex Mono',monospace; font-size:12px; letter-spacing:.14em;" style-hover="background:#8FE4FF">{{ t.ctaContact }}</button>
+    </section>
+  </main>
+  </sc-if>
+
+  <sc-if value="{{ isAbout }}">
+  <main data-screen-label="About" style="position:relative; z-index:1; max-width:1080px; margin:0 auto; padding:140px 24px 120px;">
+    <div data-reveal style="opacity:0; transform:translateY(14px); transition:opacity .7s ease, transform .7s cubic-bezier(.2,.7,.2,1);">
+      <div style="display:flex; align-items:center; gap:14px; margin-bottom:26px;">
+        <span style="font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:.2em; color:#7E97AC;">SHEET 02 — {{ t.aboutLabel }}</span>
+        <span data-line style="flex:1; height:1px; background:rgba(150,180,205,.3); transform-origin:left;"></span><span style="width:1px; height:8px; background:rgba(150,180,205,.42);"></span>
+      </div>
+      <div data-title-exit style="position:relative; animation:pbTitleExit linear both; animation-duration:auto; animation-timeline:view(); animation-range:exit 0% exit 100%;">
+        <div data-noprint data-dim="v" style="display:{{ rulerDisplay }}; flex-direction:column; align-items:center; position:absolute; left:-34px; top:4px; bottom:4px; width:11px;"><span data-dimtick style="width:9px; height:1px; background:rgba(150,180,205,.5); flex:none; animation:pbFadeIn linear both; animation-duration:auto; animation-timeline:view(); animation-range:entry 20% cover 62%;"></span><span data-dimline="y" style="flex:1; width:1px; background:rgba(150,180,205,.34); animation:pbDimY cubic-bezier(.2,.7,.2,1) both; animation-duration:auto; animation-timeline:view(); animation-range:entry 8% cover 58%;"></span><span data-dim-val style="writing-mode:vertical-rl; transform:rotate(180deg); margin:10px 0; font-family:'IBM Plex Mono',monospace; font-size:9px; letter-spacing:.18em; color:#5E7386; white-space:nowrap;"></span><span data-dimline="y" style="flex:1; width:1px; background:rgba(150,180,205,.34); animation:pbDimY cubic-bezier(.2,.7,.2,1) both; animation-duration:auto; animation-timeline:view(); animation-range:entry 8% cover 58%;"></span><span data-dimtick style="width:9px; height:1px; background:rgba(150,180,205,.5); flex:none; animation:pbFadeIn linear both; animation-duration:auto; animation-timeline:view(); animation-range:entry 20% cover 62%;"></span></div>
+        <h1 style="margin:0; font-size:clamp(34px,5.6vw,64px); line-height:1.02; font-weight:600; letter-spacing:-.03em;">{{ name }}</h1>
+      </div>
+      <p style="margin:22px 0 0; max-width:720px; font-size:clamp(18px,2.1vw,23px); line-height:1.5; color:#BCD3E4; text-wrap:pretty;">{{ t.aboutLede }}</p>
+      <div data-noprint data-dim="h" style="max-width:720px; margin-top:18px; display:flex; align-items:center; gap:0;">
+  <span data-dimtick style="width:1px; height:9px; background:rgba(150,180,205,.5); animation:pbFadeIn linear both; animation-duration:auto; animation-timeline:view(); animation-range:entry 20% cover 62%;"></span>
+  <span data-dimline="x" style="flex:1; height:1px; background:rgba(150,180,205,.34); animation:pbDimX cubic-bezier(.2,.7,.2,1) both; animation-duration:auto; animation-timeline:view(); animation-range:entry 8% cover 58%;"></span>
+  <span data-dim-val style="margin:0 10px; font-family:'IBM Plex Mono',monospace; font-size:9px; letter-spacing:.18em; color:#5E7386; white-space:nowrap;"></span>
+  <span data-dimline="x" style="flex:1; height:1px; background:rgba(150,180,205,.34); animation:pbDimX cubic-bezier(.2,.7,.2,1) both; animation-duration:auto; animation-timeline:view(); animation-range:entry 8% cover 58%;"></span>
+  <span data-dimtick style="width:1px; height:9px; background:rgba(150,180,205,.5); animation:pbFadeIn linear both; animation-duration:auto; animation-timeline:view(); animation-range:entry 20% cover 62%;"></span>
+</div>
+    </div>
+
+    <div style="display:grid; grid-template-columns:{{ aboutCols }}; gap:48px; margin-top:80px;">
+      <div data-reveal style="opacity:0; transform:translateY(14px); transition:opacity .7s ease, transform .7s cubic-bezier(.2,.7,.2,1); position:relative; display:flex; flex-direction:column; gap:34px;">
+        <div data-noprint data-dim="v" style="display:{{ rulerDisplay }}; flex-direction:column; align-items:center; position:absolute; left:-34px; top:4px; bottom:4px; width:11px;"><span data-dimtick style="width:9px; height:1px; background:rgba(150,180,205,.5); flex:none; animation:pbFadeIn linear both; animation-duration:auto; animation-timeline:view(); animation-range:entry 20% cover 62%;"></span><span data-dimline="y" style="flex:1; width:1px; background:rgba(150,180,205,.34); animation:pbDimY cubic-bezier(.2,.7,.2,1) both; animation-duration:auto; animation-timeline:view(); animation-range:entry 8% cover 58%;"></span><span data-dim-val style="writing-mode:vertical-rl; transform:rotate(180deg); margin:10px 0; font-family:'IBM Plex Mono',monospace; font-size:9px; letter-spacing:.18em; color:#5E7386; white-space:nowrap;"></span><span data-dimline="y" style="flex:1; width:1px; background:rgba(150,180,205,.34); animation:pbDimY cubic-bezier(.2,.7,.2,1) both; animation-duration:auto; animation-timeline:view(); animation-range:entry 8% cover 58%;"></span><span data-dimtick style="width:9px; height:1px; background:rgba(150,180,205,.5); flex:none; animation:pbFadeIn linear both; animation-duration:auto; animation-timeline:view(); animation-range:entry 20% cover 62%;"></span></div>
+        <sc-for list="{{ aboutBlocks }}" as="b" hint-placeholder-count="4">
+          <div>
+            <div style="display:flex; align-items:center; gap:12px; margin-bottom:14px;">
+              <span style="font-family:'IBM Plex Mono',monospace; font-size:10px; letter-spacing:.18em; color:#7E97AC;">{{ b.fig }}</span>
+              <span data-line style="flex:1; border-top:1px dashed rgba(150,180,205,.26); transform-origin:left;"></span>
+            </div>
+            <h3 style="margin:0 0 10px; font-size:20px; font-weight:600; letter-spacing:-.015em;">{{ b.title }}</h3>
+            <p style="margin:0; font-size:16px; line-height:1.62; color:#93A6B8; text-wrap:pretty;">{{ b.body }}</p>
+          </div>
+        </sc-for>
+      </div>
+
+      <aside data-reveal style="opacity:0; transform:translateY(14px); transition:opacity .7s ease, transform .7s cubic-bezier(.2,.7,.2,1);">
+        <div style="border:1px solid rgba(150,180,205,.22); padding:24px 22px;">
+          <div style="font-family:'IBM Plex Mono',monospace; font-size:10px; letter-spacing:.18em; color:#7E97AC; margin-bottom:18px;">{{ t.skillsLabel }}</div>
+          <div style="display:flex; flex-direction:column; gap:22px;">
+            <sc-for list="{{ aboutStack }}" as="g" hint-placeholder-count="6">
+              <div>
+                <div style="font-family:'IBM Plex Mono',monospace; font-size:10px; letter-spacing:.14em; color:#7A8DA0; margin-bottom:10px;">{{ g.label }}</div>
+                <div style="display:flex; flex-wrap:wrap; gap:6px;">
+                  <sc-for list="{{ g.items }}" as="i" hint-placeholder-count="4">
+                    <span style="font-family:'IBM Plex Mono',monospace; font-size:11px; color:#BCD3E4; border:1px solid rgba(150,180,205,.2); padding:5px 9px;">{{ i }}</span>
+                  </sc-for>
+                </div>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+      </aside>
+    </div>
+  </main>
+  </sc-if>
+
+  <sc-if value="{{ isCase }}">
+  <main data-screen-label="Case study" style="position:relative; z-index:1; max-width:1280px; margin:0 auto; padding:120px 24px 120px;">
+    <div style="display:grid; grid-template-columns:{{ caseCols }}; gap:56px;">
+
+      <nav data-noprint data-thin-scroll style="display:{{ indexDisplay }}; position:sticky; top:110px; align-self:start; max-height:calc(100vh - 150px); overflow:auto; scrollbar-width:thin; scrollbar-color:rgba(150,180,205,.28) transparent;">
+        <div style="border-left:1px solid rgba(150,180,205,.22); padding-left:16px;">
+          <div style="font-family:'IBM Plex Mono',monospace; font-size:10px; letter-spacing:.18em; color:#5E7386; margin-bottom:14px;">{{ t.indexLabel }}</div>
+          <ul style="margin:0; padding:0; list-style:none; display:flex; flex-direction:column; gap:2px;">
+            <sc-for list="{{ index }}" as="s" hint-placeholder-count="15">
+              <li><button onClick="{{ s.go }}" style="appearance:none; background:transparent; border:0; text-align:left; width:100%; cursor:pointer; display:flex; gap:10px; padding:6px 0; font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:.08em; color:{{ s.color }};" style-hover="color:#8FE4FF"><span style="color:{{ s.numColor }}">{{ s.n }}</span>{{ s.label }}</button></li>
+            </sc-for>
+          </ul>
+        </div>
+      </nav>
+
+      <div>
+        <section id="sec-hero" data-sec="hero" style="padding-top:24px;">
+          <div data-reveal style="opacity:0; transform:translateY(14px); transition:opacity .7s ease, transform .7s cubic-bezier(.2,.7,.2,1);">
+            <div style="display:flex; align-items:center; gap:14px; margin-bottom:22px;">
+              <span style="font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:.2em; color:#7E97AC;">FIG. 01 — {{ t.secHero }}</span>
+              <span data-line style="flex:1; height:1px; background:rgba(150,180,205,.3); transform-origin:left;"></span><span style="width:1px; height:8px; background:rgba(150,180,205,.42);"></span>
+              <span style="font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:.14em; color:#5E7386;">SPEC-{{ cs.code }}</span>
+            </div>
+            <div data-title-exit style="position:relative; animation:pbTitleExit linear both; animation-duration:auto; animation-timeline:view(); animation-range:exit 0% exit 100%;">
+              <div data-noprint data-dim="v" style="display:{{ rulerDisplay }}; flex-direction:column; align-items:center; position:absolute; left:-34px; top:4px; bottom:4px; width:11px;"><span data-dimtick style="width:9px; height:1px; background:rgba(150,180,205,.5); flex:none; animation:pbFadeIn linear both; animation-duration:auto; animation-timeline:view(); animation-range:entry 20% cover 62%;"></span><span data-dimline="y" style="flex:1; width:1px; background:rgba(150,180,205,.34); animation:pbDimY cubic-bezier(.2,.7,.2,1) both; animation-duration:auto; animation-timeline:view(); animation-range:entry 8% cover 58%;"></span><span data-dim-val style="writing-mode:vertical-rl; transform:rotate(180deg); margin:10px 0; font-family:'IBM Plex Mono',monospace; font-size:9px; letter-spacing:.18em; color:#5E7386; white-space:nowrap;"></span><span data-dimline="y" style="flex:1; width:1px; background:rgba(150,180,205,.34); animation:pbDimY cubic-bezier(.2,.7,.2,1) both; animation-duration:auto; animation-timeline:view(); animation-range:entry 8% cover 58%;"></span><span data-dimtick style="width:9px; height:1px; background:rgba(150,180,205,.5); flex:none; animation:pbFadeIn linear both; animation-duration:auto; animation-timeline:view(); animation-range:entry 20% cover 62%;"></span></div>
+              <h1 style="margin:0; font-size:clamp(38px,6.2vw,76px); line-height:1; font-weight:600; letter-spacing:-.035em;">{{ cs.name }}</h1>
+            </div>
+            <div style="margin-top:12px; font-family:'IBM Plex Mono',monospace; font-size:12px; letter-spacing:.14em; color:#9FC2DC;">{{ cs.kind }}</div>
+            <p style="margin:28px 0 0; max-width:720px; font-size:clamp(19px,2.2vw,26px); line-height:1.42; color:#BCD3E4; text-wrap:pretty;">{{ cs.line }}</p>
+            <div data-noprint data-dim="h" style="max-width:720px; margin-top:18px; display:flex; align-items:center; gap:0;">
+  <span data-dimtick style="width:1px; height:9px; background:rgba(150,180,205,.5); animation:pbFadeIn linear both; animation-duration:auto; animation-timeline:view(); animation-range:entry 20% cover 62%;"></span>
+  <span data-dimline="x" style="flex:1; height:1px; background:rgba(150,180,205,.34); animation:pbDimX cubic-bezier(.2,.7,.2,1) both; animation-duration:auto; animation-timeline:view(); animation-range:entry 8% cover 58%;"></span>
+  <span data-dim-val style="margin:0 10px; font-family:'IBM Plex Mono',monospace; font-size:9px; letter-spacing:.18em; color:#5E7386; white-space:nowrap;"></span>
+  <span data-dimline="x" style="flex:1; height:1px; background:rgba(150,180,205,.34); animation:pbDimX cubic-bezier(.2,.7,.2,1) both; animation-duration:auto; animation-timeline:view(); animation-range:entry 8% cover 58%;"></span>
+  <span data-dimtick style="width:1px; height:9px; background:rgba(150,180,205,.5); animation:pbFadeIn linear both; animation-duration:auto; animation-timeline:view(); animation-range:entry 20% cover 62%;"></span>
+</div>
+            <div style="margin-top:40px; height:clamp(240px,46vh,520px); border:1px solid rgba(150,180,205,.22); position:relative; animation:pbSettle cubic-bezier(.2,.7,.2,1) both; animation-duration:auto; animation-timeline:view(); animation-range:entry 8% cover 32%; display:flex; align-items:center; justify-content:center; background-image:repeating-linear-gradient(135deg, rgba(150,180,205,.07) 0 1px, transparent 1px 9px);">
+              <div data-noprint data-dim="v" style="display:{{ rulerDisplay }}; flex-direction:column; align-items:center; position:absolute; left:-34px; top:4px; bottom:4px; width:11px;"><span data-dimtick style="width:9px; height:1px; background:rgba(150,180,205,.5); flex:none; animation:pbFadeIn linear both; animation-duration:auto; animation-timeline:view(); animation-range:entry 20% cover 62%;"></span><span data-dimline="y" style="flex:1; width:1px; background:rgba(150,180,205,.34); animation:pbDimY cubic-bezier(.2,.7,.2,1) both; animation-duration:auto; animation-timeline:view(); animation-range:entry 8% cover 58%;"></span><span data-dim-val style="writing-mode:vertical-rl; transform:rotate(180deg); margin:10px 0; font-family:'IBM Plex Mono',monospace; font-size:9px; letter-spacing:.18em; color:#5E7386; white-space:nowrap;"></span><span data-dimline="y" style="flex:1; width:1px; background:rgba(150,180,205,.34); animation:pbDimY cubic-bezier(.2,.7,.2,1) both; animation-duration:auto; animation-timeline:view(); animation-range:entry 8% cover 58%;"></span><span data-dimtick style="width:9px; height:1px; background:rgba(150,180,205,.5); flex:none; animation:pbFadeIn linear both; animation-duration:auto; animation-timeline:view(); animation-range:entry 20% cover 62%;"></span></div>
+              <span style="font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:.16em; color:#6E8496;">{{ t.slotHero }}</span>
+            </div>
+          </div>
+        </section>
+
+        <section id="sec-glance" data-sec="glance" data-reveal style="opacity:0; transform:translateY(14px); transition:opacity .7s ease, transform .7s cubic-bezier(.2,.7,.2,1); padding-top:72px;">
+          <div style="display:flex; align-items:center; gap:14px; margin-bottom:22px;">
+            <span style="font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:.2em; color:#7E97AC;">FIG. 02 — {{ t.secGlance }}</span>
+            <span data-line style="flex:1; height:1px; background:rgba(150,180,205,.3); transform-origin:left;"></span><span style="width:1px; height:8px; background:rgba(150,180,205,.42);"></span>
+          </div>
+          <div style="position:relative; display:grid; grid-template-columns:{{ specCols }}; gap:1px; background:rgba(150,180,205,.16); border:1px solid rgba(150,180,205,.16);">
+            <div data-noprint data-dim="v" style="display:{{ rulerDisplay }}; flex-direction:column; align-items:center; position:absolute; left:-34px; top:4px; bottom:4px; width:11px;"><span data-dimtick style="width:9px; height:1px; background:rgba(150,180,205,.5); flex:none; animation:pbFadeIn linear both; animation-duration:auto; animation-timeline:view(); animation-range:entry 20% cover 62%;"></span><span data-dimline="y" style="flex:1; width:1px; background:rgba(150,180,205,.34); animation:pbDimY cubic-bezier(.2,.7,.2,1) both; animation-duration:auto; animation-timeline:view(); animation-range:entry 8% cover 58%;"></span><span data-dim-val style="writing-mode:vertical-rl; transform:rotate(180deg); margin:10px 0; font-family:'IBM Plex Mono',monospace; font-size:9px; letter-spacing:.18em; color:#5E7386; white-space:nowrap;"></span><span data-dimline="y" style="flex:1; width:1px; background:rgba(150,180,205,.34); animation:pbDimY cubic-bezier(.2,.7,.2,1) both; animation-duration:auto; animation-timeline:view(); animation-range:entry 8% cover 58%;"></span><span data-dimtick style="width:9px; height:1px; background:rgba(150,180,205,.5); flex:none; animation:pbFadeIn linear both; animation-duration:auto; animation-timeline:view(); animation-range:entry 20% cover 62%;"></span></div>
+            <sc-for list="{{ cs.spec }}" as="s" hint-placeholder-count="5">
+              <div style="background:#0C121A; padding:18px 16px;">
+                <div style="font-family:'IBM Plex Mono',monospace; font-size:10px; letter-spacing:.16em; color:#5E7386; margin-bottom:8px;">{{ s.k }}</div>
+                <div style="font-size:14.5px; line-height:1.4; color:#EDF4FA;">{{ s.v }}</div>
+              </div>
+            </sc-for>
+          </div>
+          <div data-noprint data-dim="h" style="margin-top:14px; display:flex; align-items:center; gap:0;">
+  <span data-dimtick style="width:1px; height:9px; background:rgba(150,180,205,.5); animation:pbFadeIn linear both; animation-duration:auto; animation-timeline:view(); animation-range:entry 20% cover 62%;"></span>
+  <span data-dimline="x" style="flex:1; height:1px; background:rgba(150,180,205,.34); animation:pbDimX cubic-bezier(.2,.7,.2,1) both; animation-duration:auto; animation-timeline:view(); animation-range:entry 8% cover 58%;"></span>
+  <span data-dim-val style="margin:0 10px; font-family:'IBM Plex Mono',monospace; font-size:9px; letter-spacing:.18em; color:#5E7386; white-space:nowrap;"></span>
+  <span data-dimline="x" style="flex:1; height:1px; background:rgba(150,180,205,.34); animation:pbDimX cubic-bezier(.2,.7,.2,1) both; animation-duration:auto; animation-timeline:view(); animation-range:entry 8% cover 58%;"></span>
+  <span data-dimtick style="width:1px; height:9px; background:rgba(150,180,205,.5); animation:pbFadeIn linear both; animation-duration:auto; animation-timeline:view(); animation-range:entry 20% cover 62%;"></span>
+</div>
+          <div style="margin-top:20px; border:1px solid rgba(150,180,205,.3); background:rgba(63,208,255,.045); padding:24px 22px;">
+            <div style="font-family:'IBM Plex Mono',monospace; font-size:10px; letter-spacing:.18em; color:#3FD0FF; margin-bottom:18px;">{{ t.highlights }}</div>
+            <div style="display:grid; grid-template-columns:{{ hiCols }}; gap:22px;">
+              <sc-for list="{{ cs.hi }}" as="h" hint-placeholder-count="3">
+                <div style="display:flex; flex-direction:column; gap:8px;">
+                  <div style="display:flex; align-items:center; gap:8px;">
+                    <span style="width:5px; height:5px; background:#3FD0FF; transform:rotate(45deg);"></span>
+                    <span style="font-family:'IBM Plex Mono',monospace; font-size:10px; letter-spacing:.14em; color:#7A8DA0;">{{ h.k }}</span>
+                  </div>
+                  <div style="font-size:16px; line-height:1.5; color:#EDF4FA; text-wrap:pretty;">{{ h.v }}</div>
+                </div>
+              </sc-for>
+            </div>
+          </div>
+        </section>
+
+        <sc-for list="{{ sections }}" as="s" hint-placeholder-count="13">
+          <section id="{{ s.id }}" data-sec="{{ s.key }}" data-reveal style="opacity:0; transform:translateY(14px); transition:opacity .7s ease, transform .7s cubic-bezier(.2,.7,.2,1); padding-top:{{ s.pad }};">
+            <div style="display:flex; align-items:center; gap:14px; margin-bottom:{{ s.gap }};">
+              <span style="font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:.2em; color:#7E97AC;">FIG. {{ s.n }} — {{ s.label }}</span>
+              <span data-line style="flex:1; height:1px; background:rgba(150,180,205,.3); transform-origin:left;"></span><span style="width:1px; height:8px; background:rgba(150,180,205,.42);"></span>
+              <span style="font-family:'IBM Plex Mono',monospace; font-size:10px; letter-spacing:.14em; color:#4E6274;">{{ s.coord }}</span>
+            </div>
+            <p style="margin:0; max-width:760px; font-size:{{ s.size }}; line-height:1.6; color:#BCD3E4; text-wrap:pretty;">{{ s.body }}</p>
+            <sc-if value="{{ s.list }}">
+              <ul style="margin:22px 0 0; padding:0; list-style:none; display:grid; grid-template-columns:{{ listCols }}; gap:1px; background:rgba(150,180,205,.16); border:1px solid rgba(150,180,205,.16);">
+                <sc-for list="{{ s.list }}" as="i" hint-placeholder-count="3">
+                  <li style="background:#0C121A; padding:18px 16px; font-size:14.5px; line-height:1.5; color:#BCD3E4;">
+                    <div style="font-family:'IBM Plex Mono',monospace; font-size:10px; color:#7E97AC; margin-bottom:8px;">{{ i.n }}</div>{{ i.v }}
+                  </li>
+                </sc-for>
+              </ul>
+            </sc-if>
+            <sc-if value="{{ s.slots }}">
+              <div style="margin-top:24px; display:grid; grid-template-columns:{{ s.slotCols }}; gap:16px;">
+                <sc-for list="{{ s.slots }}" as="p" hint-placeholder-count="2">
+                  <div style="height:{{ p.h }}; border:1px solid rgba(150,180,205,.2); position:relative; animation:pbSettle cubic-bezier(.2,.7,.2,1) both; animation-duration:auto; animation-timeline:view(); animation-range:entry 8% cover 32%; display:flex; align-items:flex-end; padding:14px; background-image:repeating-linear-gradient(135deg, rgba(150,180,205,.06) 0 1px, transparent 1px 9px);">
+                    <span style="font-family:'IBM Plex Mono',monospace; font-size:10px; letter-spacing:.14em; color:#6E8496;">{{ p.label }}</span>
+                  </div>
+                </sc-for>
+              </div>
+            </sc-if>
+            <sc-if value="{{ s.metrics }}">
+              <div style="margin-top:24px; display:grid; grid-template-columns:{{ listCols }}; gap:1px; background:rgba(150,180,205,.16); border:1px solid rgba(150,180,205,.16);">
+                <sc-for list="{{ s.metrics }}" as="m" hint-placeholder-count="3">
+                  <div style="background:#0C121A; padding:22px 18px;">
+                    <div style="font-size:34px; font-weight:600; letter-spacing:-.03em; color:#3FD0FF;">{{ m.v }}</div>
+                    <div style="margin-top:8px; font-size:14px; line-height:1.45; color:#93A6B8;">{{ m.k }}</div>
+                    <div style="margin-top:10px; font-family:'IBM Plex Mono',monospace; font-size:9.5px; letter-spacing:.12em; color:#5E7386;">{{ m.src }}</div>
+                  </div>
+                </sc-for>
+              </div>
+            </sc-if>
+            <sc-if value="{{ s.note }}">
+              <div style="margin-top:14px; display:flex; gap:8px; align-items:baseline; font-family:'IBM Plex Mono',monospace; font-size:10px; letter-spacing:.1em; color:#5E7386;"><span style="color:#7E97AC;">*</span>{{ s.note }}</div>
+            </sc-if>
+          </section>
+        </sc-for>
+
+        <div data-reveal style="opacity:0; transition:opacity .7s ease; margin-top:96px; border-top:1px solid rgba(150,180,205,.22); padding-top:26px; display:flex; flex-wrap:wrap; gap:16px; justify-content:space-between; align-items:center;">
+          <button onClick="{{ prevCase }}" style="appearance:none; background:transparent; border:1px solid rgba(150,180,205,.3); color:#EDF4FA; cursor:pointer; min-height:48px; padding:0 22px; font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:.14em;" style-hover="border-color:#7E97AC; color:#8FE4FF">← {{ prevName }}</button>
+          <button onClick="{{ nextCase }}" style="appearance:none; background:transparent; border:1px solid rgba(150,180,205,.3); color:#EDF4FA; cursor:pointer; min-height:48px; padding:0 22px; font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:.14em;" style-hover="border-color:#7E97AC; color:#8FE4FF">{{ nextName }} →</button>
+        </div>
+      </div>
+    </div>
+
+    <button data-noprint onClick="{{ toggleSheet }}" style="display:{{ fabDisplay }}; position:fixed; right:18px; bottom:18px; z-index:50; appearance:none; cursor:pointer; background:#3FD0FF; color:#04080D; border:0; min-height:48px; padding:0 20px; font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:.14em;">{{ fabLabel }}</button>
+
+    <div data-noprint style="display:{{ sheetDisplay }}; position:fixed; inset:0; z-index:49; background:rgba(4,8,13,.94); padding:24px; overflow:auto;">
+      <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:22px;">
+        <span style="font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:.18em; color:#7E97AC;">{{ t.indexLabel }}</span>
+        <button onClick="{{ toggleSheet }}" style="appearance:none; background:transparent; border:1px solid rgba(150,180,205,.3); color:#EDF4FA; cursor:pointer; min-height:44px; min-width:44px; font-family:'IBM Plex Mono',monospace; font-size:14px;">✕</button>
+      </div>
+      <ul style="margin:0; padding:0; list-style:none; display:flex; flex-direction:column; gap:1px; background:rgba(150,180,205,.16); border:1px solid rgba(150,180,205,.16);">
+        <sc-for list="{{ index }}" as="s" hint-placeholder-count="15">
+          <li style="background:#0C121A;"><button onClick="{{ s.goClose }}" style="appearance:none; background:transparent; border:0; width:100%; text-align:left; cursor:pointer; display:flex; gap:12px; padding:16px; font-family:'IBM Plex Mono',monospace; font-size:12px; letter-spacing:.1em; color:{{ s.color }};"><span style="color:{{ s.numColor }}">{{ s.n }}</span>{{ s.label }}</button></li>
+        </sc-for>
+      </ul>
+    </div>
+  </main>
+  </sc-if>
+
+  <sc-if value="{{ isResume }}">
+  <main data-screen-label="Resume" style="position:relative; z-index:1; max-width:900px; margin:0 auto; padding:140px 24px 120px;">
+    <div data-reveal style="opacity:0; transform:translateY(14px); transition:opacity .7s ease, transform .7s cubic-bezier(.2,.7,.2,1); display:flex; flex-wrap:wrap; gap:20px; align-items:flex-end; justify-content:space-between;">
+      <div>
+        <div style="font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:.2em; color:#7E97AC; margin-bottom:16px;">SHEET 04 — {{ t.resumeLabel }}</div>
+        <div data-title-exit style="position:relative; animation:pbTitleExit linear both; animation-duration:auto; animation-timeline:view(); animation-range:exit 0% exit 100%;">
+          <div data-noprint data-dim="v" style="display:{{ rulerDisplay }}; flex-direction:column; align-items:center; position:absolute; left:-34px; top:4px; bottom:4px; width:11px;"><span data-dimtick style="width:9px; height:1px; background:rgba(150,180,205,.5); flex:none; animation:pbFadeIn linear both; animation-duration:auto; animation-timeline:view(); animation-range:entry 20% cover 62%;"></span><span data-dimline="y" style="flex:1; width:1px; background:rgba(150,180,205,.34); animation:pbDimY cubic-bezier(.2,.7,.2,1) both; animation-duration:auto; animation-timeline:view(); animation-range:entry 8% cover 58%;"></span><span data-dim-val style="writing-mode:vertical-rl; transform:rotate(180deg); margin:10px 0; font-family:'IBM Plex Mono',monospace; font-size:9px; letter-spacing:.18em; color:#5E7386; white-space:nowrap;"></span><span data-dimline="y" style="flex:1; width:1px; background:rgba(150,180,205,.34); animation:pbDimY cubic-bezier(.2,.7,.2,1) both; animation-duration:auto; animation-timeline:view(); animation-range:entry 8% cover 58%;"></span><span data-dimtick style="width:9px; height:1px; background:rgba(150,180,205,.5); flex:none; animation:pbFadeIn linear both; animation-duration:auto; animation-timeline:view(); animation-range:entry 20% cover 62%;"></span></div>
+          <h1 style="margin:0; font-size:clamp(32px,5vw,56px); line-height:1.02; font-weight:600; letter-spacing:-.03em;">{{ name }}</h1>
+        </div>
+        <div style="margin-top:10px; font-family:'IBM Plex Mono',monospace; font-size:12px; letter-spacing:.14em; color:#7A8DA0;">{{ cv.title }}</div>
+      </div>
+      <a data-noprint href="{{ resumeHref }}" download target="_blank" rel="noreferrer" style="display:inline-flex; align-items:center; background:#3FD0FF; color:#04080D; padding:0 26px; min-height:50px; font-family:'IBM Plex Mono',monospace; font-size:12px; letter-spacing:.14em;" style-hover="background:#8FE4FF; color:#04080D">{{ t.downloadResume }}</a>
+    </div>
+
+    <div style="margin-top:56px; display:flex; flex-direction:column; gap:44px;">
+      <section data-reveal style="opacity:0; transform:translateY(12px); transition:opacity .6s ease, transform .6s cubic-bezier(.2,.7,.2,1);">
+        <div style="display:flex; align-items:center; gap:12px; margin-bottom:18px;">
+          <span style="font-family:'IBM Plex Mono',monospace; font-size:10px; letter-spacing:.18em; color:#7E97AC;">{{ cv.summaryLabel }}</span>
+          <span data-line style="flex:1; height:1px; background:rgba(150,180,205,.24); transform-origin:left;"></span><span style="width:1px; height:7px; background:rgba(150,180,205,.36);"></span>
+        </div>
+        <p style="margin:0; max-width:760px; font-size:16.5px; line-height:1.6; color:#BCD3E4; text-wrap:pretty;">{{ cv.summary }}</p>
+        <div data-noprint data-dim="h" style="max-width:760px; margin-top:18px; display:flex; align-items:center; gap:0;">
+  <span data-dimtick style="width:1px; height:9px; background:rgba(150,180,205,.5); animation:pbFadeIn linear both; animation-duration:auto; animation-timeline:view(); animation-range:entry 20% cover 62%;"></span>
+  <span data-dimline="x" style="flex:1; height:1px; background:rgba(150,180,205,.34); animation:pbDimX cubic-bezier(.2,.7,.2,1) both; animation-duration:auto; animation-timeline:view(); animation-range:entry 8% cover 58%;"></span>
+  <span data-dim-val style="margin:0 10px; font-family:'IBM Plex Mono',monospace; font-size:9px; letter-spacing:.18em; color:#5E7386; white-space:nowrap;"></span>
+  <span data-dimline="x" style="flex:1; height:1px; background:rgba(150,180,205,.34); animation:pbDimX cubic-bezier(.2,.7,.2,1) both; animation-duration:auto; animation-timeline:view(); animation-range:entry 8% cover 58%;"></span>
+  <span data-dimtick style="width:1px; height:9px; background:rgba(150,180,205,.5); animation:pbFadeIn linear both; animation-duration:auto; animation-timeline:view(); animation-range:entry 20% cover 62%;"></span>
+</div>
+      </section>
+
+      <section data-reveal style="opacity:0; transform:translateY(12px); transition:opacity .6s ease, transform .6s cubic-bezier(.2,.7,.2,1);">
+        <div style="display:flex; align-items:center; gap:12px; margin-bottom:22px;">
+          <span style="font-family:'IBM Plex Mono',monospace; font-size:10px; letter-spacing:.18em; color:#7E97AC;">{{ cv.expLabel }}</span>
+          <span data-line style="flex:1; height:1px; background:rgba(150,180,205,.24); transform-origin:left;"></span><span style="width:1px; height:7px; background:rgba(150,180,205,.36);"></span>
+        </div>
+        <div style="position:relative; display:flex; flex-direction:column; gap:30px;">
+          <div data-noprint data-dim="v" style="display:{{ rulerDisplay }}; flex-direction:column; align-items:center; position:absolute; left:-34px; top:4px; bottom:4px; width:11px;"><span data-dimtick style="width:9px; height:1px; background:rgba(150,180,205,.5); flex:none; animation:pbFadeIn linear both; animation-duration:auto; animation-timeline:view(); animation-range:entry 20% cover 62%;"></span><span data-dimline="y" style="flex:1; width:1px; background:rgba(150,180,205,.34); animation:pbDimY cubic-bezier(.2,.7,.2,1) both; animation-duration:auto; animation-timeline:view(); animation-range:entry 8% cover 58%;"></span><span data-dim-val style="writing-mode:vertical-rl; transform:rotate(180deg); margin:10px 0; font-family:'IBM Plex Mono',monospace; font-size:9px; letter-spacing:.18em; color:#5E7386; white-space:nowrap;"></span><span data-dimline="y" style="flex:1; width:1px; background:rgba(150,180,205,.34); animation:pbDimY cubic-bezier(.2,.7,.2,1) both; animation-duration:auto; animation-timeline:view(); animation-range:entry 8% cover 58%;"></span><span data-dimtick style="width:9px; height:1px; background:rgba(150,180,205,.5); flex:none; animation:pbFadeIn linear both; animation-duration:auto; animation-timeline:view(); animation-range:entry 20% cover 62%;"></span></div>
+          <sc-for list="{{ cv.exp }}" as="row" hint-placeholder-count="5">
+            <div style="display:grid; grid-template-columns:{{ resumeCols }}; gap:18px;">
+              <div style="font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:.1em; color:#5E7386; padding-top:3px;">{{ row.when }}</div>
+              <div>
+                <div style="font-size:17px; font-weight:600; letter-spacing:-.015em; text-wrap:pretty;">{{ row.title }}</div>
+                <div style="margin-top:5px; font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:.08em; color:#9FC2DC;">{{ row.org }}</div>
+                <ul style="margin:14px 0 0; padding:0; list-style:none; display:flex; flex-direction:column; gap:9px;">
+                  <sc-for list="{{ row.bullets }}" as="b" hint-placeholder-count="4">
+                    <li style="display:flex; gap:11px; font-size:15px; line-height:1.58; color:#93A6B8; text-wrap:pretty;"><span style="width:4px; height:4px; margin-top:9px; background:rgba(150,180,205,.6); flex:none; transform:rotate(45deg);"></span>{{ b }}</li>
+                  </sc-for>
+                </ul>
+              </div>
+            </div>
+          </sc-for>
+        </div>
+      </section>
+
+      <section data-reveal style="opacity:0; transform:translateY(12px); transition:opacity .6s ease, transform .6s cubic-bezier(.2,.7,.2,1);">
+        <div style="display:flex; align-items:center; gap:12px; margin-bottom:22px;">
+          <span style="font-family:'IBM Plex Mono',monospace; font-size:10px; letter-spacing:.18em; color:#7E97AC;">{{ cv.eduLabel }}</span>
+          <span data-line style="flex:1; height:1px; background:rgba(150,180,205,.24); transform-origin:left;"></span><span style="width:1px; height:7px; background:rgba(150,180,205,.36);"></span>
+        </div>
+        <div style="display:flex; flex-direction:column; gap:20px;">
+          <sc-for list="{{ cv.edu }}" as="row" hint-placeholder-count="3">
+            <div style="display:grid; grid-template-columns:{{ resumeCols }}; gap:18px; align-items:baseline;">
+              <div style="font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:.1em; color:#5E7386;">{{ row.when }}</div>
+              <div>
+                <div style="font-size:17px; font-weight:600; letter-spacing:-.015em;">{{ row.title }}</div>
+                <div style="margin-top:5px; font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:.08em; color:#9FC2DC;">{{ row.org }}</div>
+              </div>
+            </div>
+          </sc-for>
+        </div>
+      </section>
+
+      <section data-reveal style="opacity:0; transform:translateY(12px); transition:opacity .6s ease, transform .6s cubic-bezier(.2,.7,.2,1);">
+        <div style="display:flex; align-items:center; gap:12px; margin-bottom:18px;">
+          <span style="font-family:'IBM Plex Mono',monospace; font-size:10px; letter-spacing:.18em; color:#7E97AC;">{{ cv.certLabel }}</span>
+          <span data-line style="flex:1; height:1px; background:rgba(150,180,205,.24); transform-origin:left;"></span><span style="width:1px; height:7px; background:rgba(150,180,205,.36);"></span>
+        </div>
+        <ul style="margin:0; padding:0; list-style:none; display:grid; grid-template-columns:{{ certCols }}; gap:10px 24px;">
+          <sc-for list="{{ cv.certs }}" as="c" hint-placeholder-count="6">
+            <li style="display:flex; gap:11px; font-size:15px; line-height:1.5; color:#BCD3E4;"><span style="width:4px; height:4px; margin-top:8px; background:rgba(150,180,205,.6); flex:none; transform:rotate(45deg);"></span>{{ c }}</li>
+          </sc-for>
+        </ul>
+      </section>
+
+      <section data-reveal style="opacity:0; transform:translateY(12px); transition:opacity .6s ease, transform .6s cubic-bezier(.2,.7,.2,1);">
+        <div style="display:flex; align-items:center; gap:12px; margin-bottom:18px;">
+          <span style="font-family:'IBM Plex Mono',monospace; font-size:10px; letter-spacing:.18em; color:#7E97AC;">{{ t.stackLabel }}</span>
+          <span data-line style="flex:1; height:1px; background:rgba(150,180,205,.24); transform-origin:left;"></span><span style="width:1px; height:7px; background:rgba(150,180,205,.36);"></span>
+        </div>
+        <div style="display:grid; grid-template-columns:{{ stackCols }}; gap:1px; background:rgba(150,180,205,.16); border:1px solid rgba(150,180,205,.16);">
+          <sc-for list="{{ cv.skills }}" as="g" hint-placeholder-count="4">
+            <div style="background:#0C121A; padding:20px 18px;">
+              <div style="font-family:'IBM Plex Mono',monospace; font-size:10px; letter-spacing:.18em; color:#7E97AC; margin-bottom:12px;">{{ g.label }}</div>
+              <ul style="margin:0; padding:0; list-style:none; display:flex; flex-direction:column; gap:7px;">
+                <sc-for list="{{ g.items }}" as="i" hint-placeholder-count="4">
+                  <li style="font-size:14px; line-height:1.4; color:#BCD3E4; display:flex; gap:9px; align-items:baseline;"><span style="width:4px; height:4px; background:rgba(150,180,205,.55); flex:none; transform:translateY(-3px) rotate(45deg);"></span>{{ i }}</li>
+                </sc-for>
+              </ul>
+            </div>
+          </sc-for>
+        </div>
+      </section>
+    </div>
+  </main>
+  </sc-if>
+
+  <sc-if value="{{ isContact }}">
+  <main data-screen-label="Contact" style="position:relative; z-index:1; max-width:980px; margin:0 auto; padding:140px 24px 140px;">
+    <div data-reveal style="opacity:0; transform:translateY(14px); transition:opacity .7s ease, transform .7s cubic-bezier(.2,.7,.2,1);">
+      <div style="display:flex; align-items:center; gap:14px; margin-bottom:24px;">
+        <span style="font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:.2em; color:#7E97AC;">SHEET 05 — {{ t.contactLabel }}</span>
+        <span data-line style="flex:1; height:1px; background:rgba(150,180,205,.3); transform-origin:left;"></span><span style="width:1px; height:8px; background:rgba(150,180,205,.42);"></span>
+      </div>
+      <div data-title-exit style="position:relative; animation:pbTitleExit linear both; animation-duration:auto; animation-timeline:view(); animation-range:exit 0% exit 100%;">
+        <div data-noprint data-dim="v" style="display:{{ rulerDisplay }}; flex-direction:column; align-items:center; position:absolute; left:-34px; top:4px; bottom:4px; width:11px;"><span data-dimtick style="width:9px; height:1px; background:rgba(150,180,205,.5); flex:none; animation:pbFadeIn linear both; animation-duration:auto; animation-timeline:view(); animation-range:entry 20% cover 62%;"></span><span data-dimline="y" style="flex:1; width:1px; background:rgba(150,180,205,.34); animation:pbDimY cubic-bezier(.2,.7,.2,1) both; animation-duration:auto; animation-timeline:view(); animation-range:entry 8% cover 58%;"></span><span data-dim-val style="writing-mode:vertical-rl; transform:rotate(180deg); margin:10px 0; font-family:'IBM Plex Mono',monospace; font-size:9px; letter-spacing:.18em; color:#5E7386; white-space:nowrap;"></span><span data-dimline="y" style="flex:1; width:1px; background:rgba(150,180,205,.34); animation:pbDimY cubic-bezier(.2,.7,.2,1) both; animation-duration:auto; animation-timeline:view(); animation-range:entry 8% cover 58%;"></span><span data-dimtick style="width:9px; height:1px; background:rgba(150,180,205,.5); flex:none; animation:pbFadeIn linear both; animation-duration:auto; animation-timeline:view(); animation-range:entry 20% cover 62%;"></span></div>
+        <h1 style="margin:0; max-width:760px; font-size:clamp(30px,4.4vw,52px); line-height:1.06; font-weight:600; letter-spacing:-.03em; text-wrap:balance;">{{ t.contactHeading }}</h1>
+      </div>
+      <div data-noprint data-dim="h" style="max-width:760px; margin-top:20px; display:flex; align-items:center; gap:0;">
+  <span data-dimtick style="width:1px; height:9px; background:rgba(150,180,205,.5); animation:pbFadeIn linear both; animation-duration:auto; animation-timeline:view(); animation-range:entry 20% cover 62%;"></span>
+  <span data-dimline="x" style="flex:1; height:1px; background:rgba(150,180,205,.34); animation:pbDimX cubic-bezier(.2,.7,.2,1) both; animation-duration:auto; animation-timeline:view(); animation-range:entry 8% cover 58%;"></span>
+  <span data-dim-val style="margin:0 10px; font-family:'IBM Plex Mono',monospace; font-size:9px; letter-spacing:.18em; color:#5E7386; white-space:nowrap;"></span>
+  <span data-dimline="x" style="flex:1; height:1px; background:rgba(150,180,205,.34); animation:pbDimX cubic-bezier(.2,.7,.2,1) both; animation-duration:auto; animation-timeline:view(); animation-range:entry 8% cover 58%;"></span>
+  <span data-dimtick style="width:1px; height:9px; background:rgba(150,180,205,.5); animation:pbFadeIn linear both; animation-duration:auto; animation-timeline:view(); animation-range:entry 20% cover 62%;"></span>
+</div>
+    </div>
+    <div style="margin-top:56px; display:grid; grid-template-columns:{{ contactCols }}; gap:44px; align-items:start;">
+      <form onSubmit="{{ submit }}" data-reveal style="opacity:0; transform:translateY(14px); transition:opacity .7s ease, transform .7s cubic-bezier(.2,.7,.2,1); position:relative; display:flex; flex-direction:column; gap:22px;">
+        <div data-noprint data-dim="v" style="display:{{ rulerDisplay }}; flex-direction:column; align-items:center; position:absolute; left:-34px; top:4px; bottom:4px; width:11px;"><span data-dimtick style="width:9px; height:1px; background:rgba(150,180,205,.5); flex:none; animation:pbFadeIn linear both; animation-duration:auto; animation-timeline:view(); animation-range:entry 20% cover 62%;"></span><span data-dimline="y" style="flex:1; width:1px; background:rgba(150,180,205,.34); animation:pbDimY cubic-bezier(.2,.7,.2,1) both; animation-duration:auto; animation-timeline:view(); animation-range:entry 8% cover 58%;"></span><span data-dim-val style="writing-mode:vertical-rl; transform:rotate(180deg); margin:10px 0; font-family:'IBM Plex Mono',monospace; font-size:9px; letter-spacing:.18em; color:#5E7386; white-space:nowrap;"></span><span data-dimline="y" style="flex:1; width:1px; background:rgba(150,180,205,.34); animation:pbDimY cubic-bezier(.2,.7,.2,1) both; animation-duration:auto; animation-timeline:view(); animation-range:entry 8% cover 58%;"></span><span data-dimtick style="width:9px; height:1px; background:rgba(150,180,205,.5); flex:none; animation:pbFadeIn linear both; animation-duration:auto; animation-timeline:view(); animation-range:entry 20% cover 62%;"></span></div>
+        <label style="display:flex; flex-direction:column; gap:8px;">
+          <span style="font-family:'IBM Plex Mono',monospace; font-size:10px; letter-spacing:.16em; color:#7A8DA0;">{{ t.fName }}</span>
+          <input type="text" name="cname" style="background:#0C121A; border:1px solid rgba(150,180,205,.22); color:#EDF4FA; font-family:'Space Grotesk',sans-serif; font-size:16px; padding:14px; min-height:48px; outline:none;" style-focus="border-color:#7E97AC" />
+        </label>
+        <label style="display:flex; flex-direction:column; gap:8px;">
+          <span style="font-family:'IBM Plex Mono',monospace; font-size:10px; letter-spacing:.16em; color:#7A8DA0;">{{ t.fEmail }}</span>
+          <input type="email" name="cemail" style="background:#0C121A; border:1px solid rgba(150,180,205,.22); color:#EDF4FA; font-family:'Space Grotesk',sans-serif; font-size:16px; padding:14px; min-height:48px; outline:none;" style-focus="border-color:#7E97AC" />
+        </label>
+        <label style="display:flex; flex-direction:column; gap:8px;">
+          <span style="font-family:'IBM Plex Mono',monospace; font-size:10px; letter-spacing:.16em; color:#7A8DA0;">{{ t.fMessage }}</span>
+          <textarea rows="6" name="cmessage" style="background:#0C121A; border:1px solid rgba(150,180,205,.22); color:#EDF4FA; font-family:'Space Grotesk',sans-serif; font-size:16px; padding:14px; outline:none; resize:vertical;" style-focus="border-color:#7E97AC"></textarea>
+        </label>
+        <button type="submit" style="appearance:none; cursor:pointer; background:#3FD0FF; color:#04080D; border:0; min-height:52px; padding:0 28px; align-self:flex-start; font-family:'IBM Plex Mono',monospace; font-size:12px; letter-spacing:.14em;" style-hover="background:#8FE4FF">{{ sendLabel }}</button>
+      </form>
+      <aside data-reveal style="opacity:0; transform:translateY(14px); transition:opacity .7s ease, transform .7s cubic-bezier(.2,.7,.2,1); border:1px solid rgba(150,180,205,.22); padding:24px 22px; display:flex; flex-direction:column; gap:20px;">
+        <div>
+          <div style="font-family:'IBM Plex Mono',monospace; font-size:10px; letter-spacing:.16em; color:#5E7386; margin-bottom:8px;">EMAIL</div>
+          <a href="mailto:eduardoazuolas@gmail.com" style="font-size:16px; word-break:break-all;">eduardoazuolas@gmail.com</a>
+        </div>
+        <div style="border-top:1px dashed rgba(150,180,205,.24); padding-top:20px;">
+          <div style="font-family:'IBM Plex Mono',monospace; font-size:10px; letter-spacing:.16em; color:#5E7386; margin-bottom:8px;">LINKEDIN</div>
+          <a href="https://www.linkedin.com/in/eduardo-azuolas" target="_blank" rel="noreferrer" style="font-size:16px;">/in/eduardo-azuolas</a>
+        </div>
+        <div style="border-top:1px dashed rgba(150,180,205,.24); padding-top:20px;">
+          <div style="font-family:'IBM Plex Mono',monospace; font-size:10px; letter-spacing:.16em; color:#5E7386; margin-bottom:8px;">LOCATION</div>
+          <div style="font-size:16px; line-height:1.5; color:#BCD3E4;">São Paulo, Brazil · GMT-3</div>
+        </div>
+        <div style="border-top:1px dashed rgba(150,180,205,.24); padding-top:20px;">
+          <div style="font-family:'IBM Plex Mono',monospace; font-size:10px; letter-spacing:.16em; color:#5E7386; margin-bottom:8px;">{{ t.availability }}</div>
+          <div style="display:flex; align-items:center; gap:10px;">
+            <span data-live-dot style="width:8px; height:8px; border-radius:50%; background:#35D98B; flex:none; animation:pbLive 2s ease-out infinite;"></span>
+            <span style="font-family:'IBM Plex Mono',monospace; font-size:12px; letter-spacing:.14em; color:#BCD3E4;">{{ t.availableLabel }}</span>
+          </div>
+        </div>
+      </aside>
+    </div>
+  </main>
+  </sc-if>
+
+  <footer data-noprint style="position:relative; z-index:1; border-top:1px solid rgba(150,180,205,.16); padding:26px 24px;">
+    <div style="max-width:1280px; margin:0 auto; display:flex; flex-wrap:wrap; gap:12px; justify-content:space-between; font-family:'IBM Plex Mono',monospace; font-size:10px; letter-spacing:.14em; color:#5E7386;">
+      <span>{{ name }} — {{ t.role }}</span>
+      <span style="display:flex; align-items:center; gap:10px;">
+        <span style="display:flex; align-items:flex-end; gap:0;">
+          <span style="width:1px; height:8px; background:rgba(150,180,205,.45);"></span>
+          <span style="width:26px; height:1px; background:rgba(150,180,205,.3);"></span>
+          <span style="width:1px; height:5px; background:rgba(150,180,205,.35);"></span>
+          <span style="width:26px; height:1px; background:rgba(150,180,205,.3);"></span>
+          <span style="width:1px; height:8px; background:rgba(150,180,205,.45);"></span>
+        </span>
+        REV. 2026.08 · {{ t.footerNote }}
+      </span>
+    </div>
+  </footer>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1440,&quot;height&quot;:900},&quot;forceMotion&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:false,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Motion&quot;},&quot;workLayout&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;plates&quot;,&quot;bound&quot;],&quot;default&quot;:&quot;plates&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Selected work&quot;}}">
+const SECS = [
+  ['context','Context','Contexto'],['problem','Problem','Problema'],['goals','Goals','Objetivos'],
+  ['research','Research','Pesquisa'],['insights','Insights','Insights'],['strategy','Strategy','Estratégia'],
+  ['exploration','Exploration','Exploração'],['uxflow','UX Flow','Fluxo UX'],['ui','UI Design','Design de UI'],
+  ['ds','Design System','Design System'],['validation','Validation','Validação'],['outcome','Outcome','Resultado'],
+  ['learnings','Learnings','Aprendizados']
+];
+
+const T = {
+  en: {
+    role:'PRODUCT DESIGNER · UX/UI', based:'SÃO PAULO · REMOTE',
+    valueProp:'Ten years shaping physical and spatial products taught me to design for constraints, validation and systems. I bring that same rigour to digital products.',
+    heroLabel:'TITLE BLOCK', workLabel:'SELECTED WORK', sheets:'SHEETS', openSheet:'OPEN SHEET',
+    philLabel:'PHILOSOPHY', philosophy:'A screen is an assembly. If the parts don\'t fit the system, no amount of polish will hold it together.',
+    philosophySub:'I work from constraints outward: understand the mechanism, define the tolerances, then draw. It is the same method I used for injection-moulded parts, applied to flows and components.',
+    stackLabel:'TOOLS & STACK', ctaLabel:'NEXT STEP', ctaHeading:'Looking for a designer who reasons before rendering?',
+    ctaResume:'VIEW RESUME', ctaContact:'GET IN TOUCH',
+    aboutLabel:'ABOUT', skillsLabel:'TOOLS & SKILLS',
+    aboutLede:'I spent ten years designing physical and spatial products, and I now design digital ones full time. The craft transferred; the medium changed.',
+    indexLabel:'FIG. INDEX', highlights:'KEY HIGHLIGHTS', secHero:'PROJECT HERO', secGlance:'AT A GLANCE',
+    slotHero:'DROP HERO IMAGE HERE', resumeLabel:'RESUME', downloadResume:'DOWNLOAD PDF',
+    contactLabel:'CONTACT', contactHeading:'Tell me what you are building and where it is stuck.',
+    fName:'NAME', fEmail:'EMAIL', fMessage:'MESSAGE', send:'SEND MESSAGE', sent:'MESSAGE LOGGED ✓',
+    availability:'AVAILABILITY', availableLabel:'AVAILABLE',
+    footerNote:'DRAWN IN THE BROWSER', kProblem:'PROBLEM SOLVED', kMove:'STRATEGIC MOVE', kOutcome:'OUTCOME',
+    projected:'Projected from pre-launch testing, not instrumented in production.',
+    measured:'Measured in production analytics, 90 days post-launch.',
+    thin:'Section intentionally compressed — engagement scope did not include this phase.',
+    nav:{home:'HOME',about:'ABOUT',resume:'RESUME',contact:'CONTACT'},
+    spec:{role:'ROLE',duration:'DURATION',team:'TEAM',tools:'TOOLS',platform:'PLATFORM'}
+  },
+  pt: {
+    role:'PRODUCT DESIGNER · UX/UI', based:'SÃO PAULO · REMOTO',
+    valueProp:'Dez anos desenhando produtos físicos e espaciais me ensinaram a projetar dentro de restrições, validação e sistemas. Levo o mesmo rigor para produtos digitais.',
+    heroLabel:'CARIMBO', workLabel:'TRABALHOS SELECIONADOS', sheets:'PRANCHAS', openSheet:'ABRIR PRANCHA',
+    philLabel:'FILOSOFIA', philosophy:'Uma tela é uma montagem. Se as peças não servem ao sistema, nenhum acabamento vai sustentá-la.',
+    philosophySub:'Trabalho das restrições para fora: entender o mecanismo, definir as tolerâncias, depois desenhar. É o mesmo método que usava em peças injetadas, aplicado a fluxos e componentes.',
+    stackLabel:'FERRAMENTAS & STACK', ctaLabel:'PRÓXIMO PASSO', ctaHeading:'Procurando um designer que raciocina antes de renderizar?',
+    ctaResume:'VER CURRÍCULO', ctaContact:'FALE COMIGO',
+    aboutLabel:'SOBRE', skillsLabel:'FERRAMENTAS & HABILIDADES',
+    aboutLede:'Passei dez anos desenhando produtos físicos e espaciais e hoje desenho produtos digitais em tempo integral. O ofício se transferiu; o meio mudou.',
+    indexLabel:'ÍNDICE FIG.', highlights:'DESTAQUES', secHero:'ABERTURA DO PROJETO', secGlance:'RESUMO RÁPIDO',
+    slotHero:'IMAGEM PRINCIPAL AQUI', resumeLabel:'CURRÍCULO', downloadResume:'BAIXAR PDF',
+    contactLabel:'CONTATO', contactHeading:'Me conte o que você está construindo e onde travou.',
+    fName:'NOME', fEmail:'E-MAIL', fMessage:'MENSAGEM', send:'ENVIAR MENSAGEM', sent:'MENSAGEM REGISTRADA ✓',
+    availability:'DISPONIBILIDADE', availableLabel:'DISPONÍVEL',
+    footerNote:'DESENHADO NO NAVEGADOR', kProblem:'PROBLEMA RESOLVIDO', kMove:'MOVIMENTO ESTRATÉGICO', kOutcome:'RESULTADO',
+    projected:'Projetado a partir de testes pré-lançamento, não instrumentado em produção.',
+    measured:'Medido em analytics de produção, 90 dias após o lançamento.',
+    thin:'Seção comprimida de propósito — o escopo do projeto não incluiu esta fase.',
+    nav:{home:'INÍCIO',about:'SOBRE',resume:'CURRÍCULO',contact:'CONTATO'},
+    spec:{role:'FUNÇÃO',duration:'DURAÇÃO',team:'TIME',tools:'FERRAMENTAS',platform:'PLATAFORMA'}
+  }
+};
+
+const STACK = [
+  { en:['DESIGN',['Figma + FigJam','Auto Layout','Components & variants','Figma Make']], pt:['DESIGN',['Figma + FigJam','Auto Layout','Componentes & variants','Figma Make']] },
+  { en:['RESEARCH & TESTING',['UX research','User interviews','Usability testing','Interaction design']], pt:['PESQUISA & TESTES',['Pesquisa de UX','Entrevistas com usuários','Testes de usabilidade','Design de interação']] },
+  { en:['SYSTEMS',['Design systems','Style guides','Design documentation','Dev handoff']], pt:['SISTEMAS',['Design systems','Style guides','Documentação de design','Handoff para dev']] },
+  { en:['STRUCTURE',['User flows','Wireframing','Prototyping','Information architecture']], pt:['ESTRUTURA',['Fluxos de usuário','Wireframes','Prototipagem','Arquitetura de informação']] },
+  { en:['BUILD',['HTML','CSS','JavaScript','React (specialization)']], pt:['CÓDIGO',['HTML','CSS','JavaScript','React (especialização)']] },
+  { en:['FROM 10 YRS PHYSICAL',['Materials & manufacturing','Production-ready specs','Spatial & retail projects','Technical feasibility']], pt:['DE 10 ANOS EM FÍSICO',['Materiais & manufatura','Especificações para produção','Projetos espaciais & varejo','Viabilidade técnica']] },
+  { en:['WORKFLOW',['Notion','Miro','Agile','Claude']], pt:['WORKFLOW',['Notion','Miro','Agile','Claude']] },
+  { en:['LANGUAGES',['Portuguese (native)','English (C1)','French (basic)']], pt:['IDIOMAS',['Português (nativo)','Inglês (C1)','Francês (básico)']] }
+];
+
+function P(id,name,code,year,kind,line,spec,hi,s){ return {id,name,code,year,kind,line,spec,hi,s}; }
+
+const CASES = [
+  P('investiq','InvestIQ','A','2025',
+    {en:'Fintech onboarding redesign',pt:'Redesign de onboarding fintech'},
+    {en:'New investors finished signup and then never funded an account.',pt:'Novos investidores concluíam o cadastro e nunca aportavam.'},
+    {role:{en:'Lead product designer',pt:'Product designer líder'},duration:{en:'11 weeks',pt:'11 semanas'},team:{en:'PM, 3 engineers, compliance',pt:'PM, 3 engenheiros, compliance'},tools:'Figma, Maze, Notion',platform:{en:'iOS + responsive web',pt:'iOS + web responsiva'}},
+    {p:{en:'Signup completed but funding stalled — the flow proved identity without ever proving value.',pt:'O cadastro terminava, mas o aporte travava — o fluxo provava identidade, nunca valor.'},
+     m:{en:'Split onboarding into "get in" and "get invested", with a portfolio preview before any document upload.',pt:'Dividi o onboarding em "entrar" e "investir", com prévia de carteira antes de qualquer upload.'},
+     o:{en:'First deposit within 48h moved from 21% to an estimated 38% in pre-launch testing.',pt:'Primeiro depósito em 48h passou de 21% para cerca de 38% em testes pré-lançamento.'}},
+    {context:{en:'A retail investing app with strong acquisition and weak activation. Marketing filled the funnel; the product lost people at the compliance wall.',pt:'App de investimento com boa aquisição e ativação fraca. O marketing enchia o funil; o produto perdia gente na parede de compliance.'},
+     problem:{en:'Seven mandatory steps before a user saw a single number. Document upload sat in step two, where motivation is lowest and trust is not yet earned.',pt:'Sete etapas obrigatórias antes de o usuário ver um número. O upload de documentos ficava na etapa dois, onde a motivação é mínima e a confiança ainda não existe.'},
+     goals:{en:'Raise first-deposit conversion without weakening regulatory checks, and give the compliance team a flow they could sign off in one review.',pt:'Aumentar a conversão do primeiro depósito sem enfraquecer as checagens regulatórias, e entregar ao compliance um fluxo aprovável em uma única revisão.'},
+     research:{en:'Twelve moderated sessions with first-time investors, plus funnel analysis across 40k signups and a walkthrough of four competitor flows.',pt:'Doze sessões moderadas com investidores iniciantes, análise de funil em 40 mil cadastros e revisão de quatro fluxos concorrentes.'},
+     insights:{en:'People were not scared of investing. They were scared of committing documents to a product they had not seen work yet.',pt:'As pessoas não temiam investir. Temiam entregar documentos a um produto que ainda não tinham visto funcionar.'},
+     strategy:{en:'Delay verification to the last responsible moment. Earn the document upload by showing a real, personalised portfolio projection first.',pt:'Adiar a verificação para o último momento responsável. Merecer o upload mostrando antes uma projeção de carteira real e personalizada.'},
+     exploration:{en:'Three directions: a progressive-disclosure wizard, a single scrolling sheet, and a goal-first quiz. The quiz tested well on delight and badly on time-to-value.',pt:'Três direções: wizard com revelação progressiva, folha única com scroll e quiz orientado a metas. O quiz agradou, mas falhou em tempo-até-valor.'},
+     uxflow:{en:'Two tracks that converge: a three-screen entry path to the app, and a verification path triggered at the moment of funding.',pt:'Duas trilhas que convergem: um caminho de entrada em três telas e uma trilha de verificação disparada no momento do aporte.'},
+     ui:{en:'Numbers lead every screen. Progress is stated in plain language, and every regulatory requirement carries a one-line reason.',pt:'Os números lideram cada tela. O progresso é dito em linguagem simples e cada exigência regulatória traz uma frase de motivo.'},
+     ds:{en:'Extended the existing library with a verification-state component, a projection chart, and eight semantic colour tokens for risk levels.',pt:'Ampliei a biblioteca com um componente de estado de verificação, um gráfico de projeção e oito tokens semânticos para níveis de risco.'},
+     validation:{en:'Unmoderated Maze test with 60 participants against the current build, followed by a compliance and legal review round.',pt:'Teste não moderado no Maze com 60 participantes contra a versão atual, seguido de revisão com compliance e jurídico.'},
+     outcome:{en:'The redesign removed four steps before first value and gave compliance an auditable trail. Reasoning first: the win came from resequencing, not from new features.',pt:'O redesign removeu quatro etapas antes do primeiro valor e deu ao compliance uma trilha auditável. O ganho vem do resequenciamento, não de novas funcionalidades.'},
+     learnings:{en:'I would have brought compliance into week one instead of week five. Their constraints were more flexible than everyone assumed.',pt:'Teria trazido o compliance na semana um, não na cinco. As restrições deles eram mais flexíveis do que se supunha.'},
+     metrics:[{v:'38%',k:{en:'First deposit within 48h (from 21%)',pt:'Primeiro depósito em 48h (de 21%)'},proj:true},{v:'-4',k:{en:'Steps before first value',pt:'Etapas antes do primeiro valor'},proj:false},{v:'1',k:{en:'Compliance review round to sign-off',pt:'Rodada de revisão até aprovação'},proj:false}]}),
+
+  P('pulse','Pulse Analytics','B','2025',
+    {en:'B2B SaaS dashboard',pt:'Dashboard B2B SaaS'},
+    {en:'Operators exported everything to spreadsheets instead of using the dashboard.',pt:'Operadores exportavam tudo para planilhas em vez de usar o dashboard.'},
+    {role:{en:'Product designer',pt:'Product designer'},duration:{en:'14 weeks',pt:'14 semanas'},team:{en:'2 PMs, 5 engineers',pt:'2 PMs, 5 engenheiros'},tools:'Figma, Dovetail, Storybook',platform:{en:'Desktop web',pt:'Web desktop'}},
+    {p:{en:'The dashboard answered "what happened" but never "what should I do next".',pt:'O dashboard respondia "o que aconteceu", nunca "o que fazer agora".'},
+     m:{en:'Reframed the home view around three recurring operator decisions instead of 22 available charts.',pt:'Reformulei a home em torno de três decisões recorrentes do operador, não de 22 gráficos disponíveis.'},
+     o:{en:'Weekly active use of the dashboard rose 46%; CSV exports fell by a third.',pt:'Uso ativo semanal subiu 46%; exportações em CSV caíram um terço.'}},
+    {context:{en:'A logistics analytics product with 400 enterprise accounts and a dashboard that had grown by request rather than by design.',pt:'Produto de analytics para logística com 400 contas enterprise e um dashboard que cresceu por pedidos, não por projeto.'},
+     problem:{en:'Twenty-two widgets with equal visual weight. Operators could not tell which number required action today, so they rebuilt their own views offline.',pt:'Vinte e dois widgets com o mesmo peso visual. Operadores não sabiam qual número exigia ação hoje, então refaziam suas próprias visões fora do produto.'},
+     goals:{en:'Cut time-to-decision for daily operators, reduce spreadsheet exports, and make the widget library maintainable for the team.',pt:'Reduzir o tempo até a decisão, diminuir exportações para planilhas e tornar a biblioteca de widgets sustentável para o time.'},
+     research:{en:'Shadowed six operators through a full shift, then coded 30 support tickets tagged "reporting" in Dovetail.',pt:'Acompanhei seis operadores por um turno completo e codifiquei 30 tickets marcados como "relatórios" no Dovetail.'},
+     insights:{en:'Every operator ran the same three checks each morning, and none of the three had a home on the dashboard.',pt:'Todo operador fazia as mesmas três checagens toda manhã, e nenhuma delas tinha lugar no dashboard.'},
+     strategy:{en:'Design for a shift, not for a data model. Promote exceptions, demote steady state, and make drill-down the only path to detail.',pt:'Projetar para um turno, não para um modelo de dados. Promover exceções, rebaixar o estado normal e fazer do drill-down o único caminho ao detalhe.'},
+     exploration:{en:'Tested a card feed, a fixed three-panel cockpit, and a query-first canvas. The feed lost trust: operators wanted a layout that never moved.',pt:'Testei um feed de cards, um cockpit fixo de três painéis e um canvas orientado a consultas. O feed perdeu confiança: operadores querem um layout que não se mova.'},
+     uxflow:{en:'Exception list to entity detail to action, with the same three-level structure across every metric family.',pt:'Lista de exceções, detalhe da entidade, ação — a mesma estrutura de três níveis em toda família de métricas.'},
+     ui:{en:'One accent reserved exclusively for anomalies. Dense tabular type, generous row targets, and no chart without a stated threshold.',pt:'Um acento reservado só para anomalias. Tipografia tabular densa, linhas com alvo generoso e nenhum gráfico sem limite declarado.'},
+     ds:{en:'Built 14 chart primitives with a shared props contract, documented in Storybook alongside threshold and empty-state rules.',pt:'Construí 14 primitivos de gráfico com contrato de props compartilhado, documentados no Storybook com regras de limite e estado vazio.'},
+     validation:{en:'Two rounds of task-based testing with eight operators, measuring time to identify the day\'s top risk.',pt:'Duas rodadas de teste por tarefa com oito operadores, medindo o tempo para identificar o principal risco do dia.'},
+     outcome:{en:'Operators stopped rebuilding the product in Excel because the product finally matched the shape of their morning.',pt:'Os operadores pararam de refazer o produto no Excel porque o produto passou a ter a forma da manhã deles.'},
+     learnings:{en:'I over-invested in chart variety early. The value was in hierarchy and thresholds, not in new visualisations.',pt:'Investi demais em variedade de gráficos no começo. O valor estava em hierarquia e limites, não em novas visualizações.'},
+     metrics:[{v:'+46%',k:{en:'Weekly active dashboard use',pt:'Uso semanal ativo do dashboard'},proj:false},{v:'-34%',k:{en:'CSV exports per account',pt:'Exportações CSV por conta'},proj:false},{v:'2.1×',k:{en:'Faster to spot the day\'s top risk',pt:'Mais rápido para achar o risco do dia'},proj:false}]}),
+
+  P('aether','Aether','C','2026',
+    {en:'AI product onboarding',pt:'Onboarding de produto de IA'},
+    {en:'Users met a blank prompt box and had no idea what the product was for.',pt:'Usuários encontravam uma caixa de prompt vazia e não sabiam para que servia o produto.'},
+    {role:{en:'Product designer',pt:'Product designer'},duration:{en:'8 weeks',pt:'8 semanas'},team:{en:'PM, 4 engineers, ML lead',pt:'PM, 4 engenheiros, líder de ML'},tools:'Figma, ProtoPie, Maze',platform:{en:'Responsive web',pt:'Web responsiva'}},
+    {p:{en:'A blank canvas asked users to imagine the product before experiencing it.',pt:'Um canvas vazio pedia ao usuário imaginar o produto antes de experimentá-lo.'},
+     m:{en:'Replaced the empty state with three seeded, editable jobs drawn from the user\'s stated role.',pt:'Troquei o estado vazio por três tarefas editáveis, semeadas a partir da função declarada.'},
+     o:{en:'Estimated 3.4× more first-session completions in prototype testing.',pt:'Cerca de 3,4× mais conclusões na primeira sessão em teste de protótipo.'}},
+    {context:{en:'An AI writing assistant with high signup volume and a first session that ended, more often than not, in silence.',pt:'Assistente de escrita com IA, muitos cadastros e uma primeira sessão que quase sempre terminava em silêncio.'},
+     problem:{en:'Capability was invisible until you typed something good. Users did not know what "good" looked like, so they typed nothing.',pt:'A capacidade era invisível até você escrever algo bom. Ninguém sabia o que era "bom", então ninguém escrevia nada.'},
+     goals:{en:'Get users to one successful output inside the first session, and set honest expectations about what the model can and cannot do.',pt:'Levar o usuário a um resultado bom na primeira sessão e alinhar expectativas honestas sobre o que o modelo faz e não faz.'},
+     research:{en:'Session replays of 200 first visits and nine interviews with users who churned inside a week.',pt:'Replays de 200 primeiras visitas e nove entrevistas com usuários que saíram em uma semana.'},
+     insights:{en:'Users judged the product on their first output, not on the tour. Every second spent explaining was a second not spent producing.',pt:'O julgamento vinha do primeiro resultado, não do tour. Cada segundo explicando era um segundo sem produzir.'},
+     strategy:{en:'Demonstrate, do not describe. Seed the canvas with work worth editing and let the first edit be the tutorial.',pt:'Demonstrar, não descrever. Semear o canvas com trabalho que valha editar e deixar a primeira edição ser o tutorial.'},
+     exploration:{en:'Tried a guided coach-mark tour, a template gallery, and pre-seeded drafts. Coach marks were dismissed within four seconds on average.',pt:'Testei tour guiado, galeria de templates e rascunhos pré-carregados. Os coach marks eram fechados em quatro segundos, na média.'},
+     uxflow:{en:'One role question, three seeded drafts, first edit, then a lightweight explanation of controls once value has landed.',pt:'Uma pergunta de função, três rascunhos semeados, primeira edição e só então uma explicação leve dos controles.'},
+     ui:{en:'Generated content is always visually distinguished from user content, with confidence and source stated inline rather than in a tooltip.',pt:'O conteúdo gerado é sempre distinguido visualmente do conteúdo do usuário, com confiança e fonte declaradas inline, não em tooltip.'},
+     ds:{en:'Added AI-specific patterns: streaming states, regeneration affordances, correction feedback, and a disclosure token for model limits.',pt:'Adicionei padrões de IA: estados de streaming, affordances de regeneração, feedback de correção e um token de disclosure para limites do modelo.'},
+     validation:{en:'Prototype tested with 24 participants split across two seeding strategies; qualitative review with the ML team on failure modes.',pt:'Protótipo testado com 24 participantes em duas estratégias de semeadura; revisão qualitativa de falhas com o time de ML.'},
+     outcome:{en:'The onboarding stopped teaching the interface and started producing work. Numbers below come from prototype testing, before instrumentation.',pt:'O onboarding parou de ensinar a interface e passou a produzir trabalho. Os números abaixo vêm de teste de protótipo, antes da instrumentação.'},
+     learnings:{en:'Seeded content raises the stakes on quality. A bad seed is worse than an empty box, which means content design is now part of onboarding.',pt:'Conteúdo semeado eleva o risco de qualidade. Uma semente ruim é pior que caixa vazia, então content design passa a fazer parte do onboarding.'},
+     metrics:[{v:'3.4×',k:{en:'First-session completions',pt:'Conclusões na primeira sessão'},proj:true},{v:'-62%',k:{en:'Time to first useful output',pt:'Tempo até o primeiro resultado útil'},proj:true},{v:'0',k:{en:'Coach marks in the final flow',pt:'Coach marks no fluxo final'},proj:false}]}),
+
+  P('forge','Forge','D','2024',
+    {en:'Design system from scratch',pt:'Design system do zero'},
+    {en:'Four squads shipped four different versions of the same button.',pt:'Quatro squads entregavam quatro versões do mesmo botão.'},
+    {role:{en:'Design system owner',pt:'Responsável pelo design system'},duration:{en:'6 months',pt:'6 meses'},team:{en:'2 designers, 3 engineers',pt:'2 designers, 3 engenheiros'},tools:'Figma, Storybook, Tokens Studio',platform:{en:'Web + iOS + Android',pt:'Web + iOS + Android'}},
+    {p:{en:'No shared vocabulary, so every screen renegotiated spacing, colour and state from zero.',pt:'Sem vocabulário comum, cada tela renegociava espaçamento, cor e estado do zero.'},
+     m:{en:'Shipped tokens and six components before touching anything cosmetic, then let adoption pull the rest.',pt:'Entreguei tokens e seis componentes antes de qualquer coisa cosmética, e deixei a adoção puxar o resto.'},
+     o:{en:'Component reuse reached 78% of new screens within two quarters.',pt:'O reuso de componentes chegou a 78% das novas telas em dois trimestres.'}},
+    {context:{en:'A 40-person product org scaling from one product to three, with no shared foundation and rising QA cost.',pt:'Uma organização de produto com 40 pessoas indo de um para três produtos, sem base comum e com custo de QA subindo.'},
+     problem:{en:'Inconsistency was a symptom. The real cost was decision time: every squad relitigated the same primitives every sprint.',pt:'A inconsistência era sintoma. O custo real era tempo de decisão: cada squad rediscutia os mesmos primitivos a cada sprint.'},
+     goals:{en:'Cut duplicated work, make accessibility the default rather than a review step, and keep the system maintainable by a team of two.',pt:'Cortar trabalho duplicado, tornar acessibilidade o padrão em vez de etapa de revisão e manter o sistema sustentável para duas pessoas.'},
+     research:{en:'Audited 240 screens and interviewed all four squads about where they lost time and why they forked components.',pt:'Auditei 240 telas e entrevistei os quatro squads sobre onde perdiam tempo e por que bifurcavam componentes.'},
+     insights:{en:'Squads forked components when the API did not fit, not when the visuals were wrong. Governance had to start with props.',pt:'Os squads bifurcavam quando a API não servia, não quando o visual estava errado. A governança tinha de começar pelas props.'},
+     strategy:{en:'Tokens first, six highest-traffic components second, and a contribution path from day one so the system was never a bottleneck.',pt:'Tokens primeiro, seis componentes de maior tráfego depois, e um caminho de contribuição desde o primeiro dia para o sistema nunca ser gargalo.'},
+     exploration:{en:'Weighed a strict single-source library against a federated model with squad-owned extensions. Landed on strict core, open periphery.',pt:'Comparei biblioteca única e rígida com modelo federado com extensões por squad. Ficamos com núcleo rígido e periferia aberta.'},
+     uxflow:{en:'Mapped the contribution workflow itself: propose, prototype, review, promote — with a named owner at every gate.',pt:'Mapeei o próprio fluxo de contribuição: propor, prototipar, revisar, promover — com responsável nomeado em cada etapa.'},
+     ui:{en:'A four-step type scale, an eight-point spacing grid, and semantic colour roles that survive both light and dark themes.',pt:'Escala tipográfica de quatro passos, grid de espaçamento de oito pontos e papéis semânticos de cor que sobrevivem a temas claro e escuro.'},
+     ds:{en:'Three token tiers (primitive, semantic, component), 34 components, and a documentation site written for engineers first.',pt:'Três camadas de tokens (primitivo, semântico, componente), 34 componentes e um site de documentação escrito primeiro para engenheiros.'},
+     validation:{en:'Tracked adoption per squad, ran quarterly component health reviews, and audited contrast automatically in CI.',pt:'Acompanhei adoção por squad, fiz revisões trimestrais de saúde dos componentes e auditei contraste automaticamente na CI.'},
+     outcome:{en:'The system earned adoption because it removed arguments, not because it was mandated from above.',pt:'O sistema ganhou adoção por remover discussões, não por ter sido imposto de cima.'},
+     learnings:{en:'I wrote documentation too late. Adoption tracked documentation quality far more closely than component count.',pt:'Escrevi a documentação tarde demais. A adoção acompanhou a qualidade da documentação muito mais que o número de componentes.'},
+     metrics:[{v:'78%',k:{en:'New screens built from the system',pt:'Telas novas feitas com o sistema'},proj:false},{v:'34',k:{en:'Components with documented APIs',pt:'Componentes com API documentada'},proj:false},{v:'-41%',k:{en:'UI defects reaching QA',pt:'Defeitos de UI chegando ao QA'},proj:false}]}),
+
+  P('pastry','Pastry App','E','2025',
+    {en:'Mobile app · independent chef',pt:'App mobile · chef independente'},
+    {en:'Orders arrived across three channels and were tracked on paper.',pt:'Pedidos chegavam por três canais e eram controlados no papel.'},
+    {role:{en:'Sole designer',pt:'Designer único'},duration:{en:'5 weeks',pt:'5 semanas'},team:{en:'Client + 1 developer',pt:'Cliente + 1 desenvolvedor'},tools:'Figma, Notion',platform:'iOS'},
+    {p:{en:'One person running orders, stock and baking schedule from a notebook and three inboxes.',pt:'Uma pessoa controlando pedidos, estoque e agenda de produção num caderno e três caixas de entrada.'},
+     m:{en:'Designed for the chef\'s real constraint: both hands busy, phone on the counter, ten-second glances.',pt:'Projetei para a restrição real da chef: mãos ocupadas, celular no balcão, olhadas de dez segundos.'},
+     o:{en:'Order handling dropped from roughly 90 to 25 minutes a day.',pt:'A gestão de pedidos caiu de cerca de 90 para 25 minutos por dia.'}},
+    {context:{en:'A one-person pastry business taking 40 to 60 custom orders a week through Instagram, WhatsApp and walk-ins.',pt:'Uma confeitaria de uma pessoa recebendo de 40 a 60 pedidos personalizados por semana via Instagram, WhatsApp e balcão.'},
+     problem:{en:'Double bookings and forgotten allergy notes. The failure was not the tooling, it was that nothing held a single source of truth.',pt:'Agendas duplicadas e notas de alergia esquecidas. O problema não era a ferramenta, era não haver uma fonte única de verdade.'},
+     goals:{en:'One place for every order, zero double bookings, and a production view she could read with flour on her hands.',pt:'Um lugar para todo pedido, zero agendamentos duplicados e uma visão de produção legível com as mãos na farinha.'},
+     research:{en:'Two half-days in the kitchen and a review of six weeks of her order notebook.',pt:'Dois meios-períodos na cozinha e revisão de seis semanas do caderno de pedidos dela.'},
+     insights:{en:'She never used the phone while baking. Everything had to be readable in one glance or captured in one tap.',pt:'Ela nunca usava o celular assando. Tudo precisava ser legível numa olhada ou capturado num toque.'},
+     strategy:{en:'Two modes, not one app: capture mode for intake, kitchen mode for the day\'s bake list. No shared navigation between them.',pt:'Dois modos, não um app: modo captura para entrada, modo cozinha para a lista do dia. Sem navegação compartilhada.'},
+     exploration:{en:'Explored a calendar-first home versus a bake-list-first home. The calendar looked organised and answered the wrong question.',pt:'Explorei home com calendário e home com lista de produção. O calendário parecia organizado e respondia à pergunta errada.'},
+     uxflow:{en:'Intake in four taps, automatic conflict warning against capacity, then a chronological bake list per day.',pt:'Entrada em quatro toques, aviso automático de conflito com a capacidade e depois lista cronológica de produção por dia.'},
+     ui:{en:'Oversized type, high-contrast allergy flags, and a bake list readable at arm\'s length on a counter.',pt:'Tipografia grande, alertas de alergia em alto contraste e lista de produção legível à distância do braço.'},
+     ds:{en:'A deliberately small kit: eight components, two type sizes, one accent. Enough for one product, no more.',pt:'Um kit deliberadamente pequeno: oito componentes, dois tamanhos de texto, um acento. O suficiente para um produto.'},
+     validation:{en:'Tested live in her kitchen across two production days.',pt:'Testado ao vivo na cozinha dela em dois dias de produção.'},
+     outcome:{en:'She stopped keeping a parallel paper notebook after week two, which was the only adoption metric that mattered here.',pt:'Ela parou de manter o caderno paralelo na segunda semana, a única métrica de adoção que importava aqui.'},
+     learnings:{en:'Scoping down was the design work. Half the requested features would have made the kitchen view unreadable.',pt:'Reduzir o escopo foi o trabalho de design. Metade das funcionalidades pedidas tornaria a tela de cozinha ilegível.'},
+     thin:['validation'],
+     metrics:[{v:'25min',k:{en:'Daily order handling (from ~90)',pt:'Gestão diária de pedidos (de ~90)'},proj:false},{v:'0',k:{en:'Double bookings since launch',pt:'Agendamentos duplicados desde o lançamento'},proj:false},{v:'8',k:{en:'Components in the whole app',pt:'Componentes em todo o app'},proj:false}]}),
+
+  P('reloop','Reloop','F','2026',
+    {en:'Circular fashion marketplace',pt:'Marketplace de moda circular'},
+    {en:'Sellers abandoned listings halfway; buyers did not trust item condition.',pt:'Vendedores abandonavam anúncios no meio; compradores não confiavam no estado das peças.'},
+    {role:{en:'Product designer',pt:'Product designer'},duration:{en:'12 weeks',pt:'12 semanas'},team:{en:'PM, 4 engineers, ops',pt:'PM, 4 engenheiros, ops'},tools:'Figma, Maze, Hotjar',platform:{en:'Responsive web',pt:'Web responsiva'}},
+    {p:{en:'Supply and trust failed together: bad listings created buyer doubt, which discouraged sellers.',pt:'Oferta e confiança falhavam juntas: anúncios ruins geravam dúvida no comprador, o que desanimava o vendedor.'},
+     m:{en:'Made condition a structured, guided field instead of free text, and priced it into the listing flow.',pt:'Transformei estado em campo estruturado e guiado em vez de texto livre, e incorporei isso ao fluxo de anúncio.'},
+     o:{en:'Listing completion rose 31%; condition-related disputes fell by half.',pt:'A conclusão de anúncios subiu 31%; disputas por estado da peça caíram à metade.'}},
+    {context:{en:'A resale marketplace for clothing where growth depended entirely on individual sellers listing well.',pt:'Marketplace de revenda de roupas cujo crescimento dependia inteiramente de vendedores anunciando bem.'},
+     problem:{en:'The listing form asked for 14 fields and explained none. Condition was free text, so buyers had nothing comparable to judge.',pt:'O formulário pedia 14 campos e não explicava nenhum. O estado era texto livre, sem nada comparável para o comprador julgar.'},
+     goals:{en:'Increase completed listings, reduce condition disputes, and keep the flow usable on a phone in a bedroom with bad light.',pt:'Aumentar anúncios concluídos, reduzir disputas de estado e manter o fluxo usável num celular, num quarto com luz ruim.'},
+     research:{en:'Diary study with 11 sellers, funnel analysis of 8k abandoned listings, and a read of 120 dispute tickets.',pt:'Estudo de diário com 11 vendedores, análise de funil de 8 mil anúncios abandonados e leitura de 120 tickets de disputa.'},
+     insights:{en:'Sellers stalled at condition because they feared being unfair. Structure did not slow them down — it gave them permission.',pt:'Vendedores travavam no estado por medo de serem injustos. A estrutura não os atrasou — deu permissão.'},
+     strategy:{en:'Turn subjective judgement into guided choice, and show sellers the buyer\'s view of their listing before publishing.',pt:'Transformar julgamento subjetivo em escolha guiada e mostrar ao vendedor a visão do comprador antes de publicar.'},
+     exploration:{en:'Compared a photo-first flow, a chat-style intake, and a stepper with live preview. Chat felt friendly and lost people to ambiguity.',pt:'Comparei fluxo com foto primeiro, entrada em formato de chat e stepper com prévia ao vivo. O chat era simpático e perdia gente na ambiguidade.'},
+     uxflow:{en:'Photo, guided condition, price suggestion, buyer preview, publish — with a resumable draft at every step.',pt:'Foto, estado guiado, sugestão de preço, prévia do comprador, publicar — com rascunho retomável em cada etapa.'},
+     ui:{en:'Condition grades illustrated with reference photography, and a persistent preview card so sellers see what buyers will see.',pt:'Níveis de estado ilustrados com fotografia de referência e um card de prévia persistente para o vendedor ver o que o comprador verá.'},
+     ds:{en:'Introduced a condition-badge component with five grades, reused across listing, search results and the dispute flow.',pt:'Criei um componente de selo de estado com cinco níveis, reutilizado no anúncio, na busca e no fluxo de disputa.'},
+     validation:{en:'Moderated testing with nine sellers, then a two-week A/B test against the legacy form.',pt:'Testes moderados com nove vendedores e depois um teste A/B de duas semanas contra o formulário antigo.'},
+     outcome:{en:'Structuring one field improved both sides of the marketplace, because the field was where trust was actually created.',pt:'Estruturar um único campo melhorou os dois lados do marketplace, porque era ali que a confiança se criava.'},
+     learnings:{en:'I treated this as a form problem for two weeks. It was a trust problem that happened to live in a form.',pt:'Tratei isso como problema de formulário por duas semanas. Era um problema de confiança que morava num formulário.'},
+     metrics:[{v:'+31%',k:{en:'Listing completion rate',pt:'Taxa de conclusão de anúncios'},proj:false},{v:'-50%',k:{en:'Condition-related disputes',pt:'Disputas sobre estado da peça'},proj:false},{v:'5',k:{en:'Structured condition grades',pt:'Níveis estruturados de estado'},proj:false}]})
+];
+
+const SLOTS = {
+  research:{cols:'1fr 1fr',items:[{en:'RESEARCH ARTEFACT / AFFINITY MAP',pt:'ARTEFATO DE PESQUISA / MAPA DE AFINIDADE',h:'220px'},{en:'INTERVIEW OR FUNNEL DATA',pt:'ENTREVISTAS OU DADOS DE FUNIL',h:'220px'}]},
+  exploration:{cols:'repeat(3,1fr)',items:[
+    {en:'CONCEPT 01',pt:'CONCEITO 01',h:'170px'},{en:'CONCEPT 02',pt:'CONCEITO 02',h:'170px'},{en:'CONCEPT 03',pt:'CONCEITO 03',h:'170px'},
+    {en:'CONCEPT 04',pt:'CONCEITO 04',h:'170px'},{en:'CONCEPT 05',pt:'CONCEITO 05',h:'170px'},{en:'DISCARDED DIRECTION',pt:'DIREÇÃO DESCARTADA',h:'170px'}]},
+  uxflow:{cols:'1fr',items:[{en:'FLOW DIAGRAM — FULL WIDTH',pt:'DIAGRAMA DE FLUXO — LARGURA TOTAL',h:'420px'}]},
+  ui:{cols:'repeat(3,1fr)',items:[
+    {en:'KEY SCREEN 01',pt:'TELA-CHAVE 01',h:'300px'},{en:'KEY SCREEN 02',pt:'TELA-CHAVE 02',h:'300px'},{en:'KEY SCREEN 03',pt:'TELA-CHAVE 03',h:'300px'},
+    {en:'DEVICE FRAME 01',pt:'MOCKUP DE DISPOSITIVO 01',h:'380px',dev:true},{en:'DEVICE FRAME 02',pt:'MOCKUP DE DISPOSITIVO 02',h:'380px',dev:true},{en:'DEVICE FRAME 03',pt:'MOCKUP DE DISPOSITIVO 03',h:'380px',dev:true}]},
+  ds:{cols:'1fr',items:[{en:'COMPONENT & TOKEN SHEET',pt:'PRANCHA DE COMPONENTES & TOKENS',h:'340px'}]},
+  validation:{cols:'1fr 1fr',items:[{en:'TESTING SESSION PHOTO 01',pt:'FOTO DA SESSÃO DE TESTE 01',h:'220px'},{en:'TESTING SESSION PHOTO 02',pt:'FOTO DA SESSÃO DE TESTE 02',h:'220px'}]}
+};
+
+const CV = {
+  en:{
+    title:'Product Designer UX/UI',
+    contact:['+55 (11) 97481-9840','eduardoazuolas@gmail.com','São Paulo, Brazil','linkedin.com/in/eduardo-azuolas','eduardoazuolas.com.br'],
+    summaryLabel:'SUMMARY',
+    summary:'Product Designer with 10+ years of experience solving complex design problems across physical and digital products. I bring a user-centered approach to research, interaction design, prototyping, usability testing, visual design, and design systems, while working closely with stakeholders and technical teams. My work has contributed to measurable improvements including 12% lower user drop-off, 22% fewer revisions, and 25–30% faster project delivery.',
+    expLabel:'PROFESSIONAL EXPERIENCE',
+    exp:[
+      { when:'01/2026 — PRESENT', title:'Product Designer UX/UI', org:'Freelance — São Paulo, Brazil · Remote', bullets:[
+        'Design responsive web and app experiences from discovery to high-fidelity UI, turning user needs and research insights into clear, intuitive product solutions.',
+        'Conduct user interviews and usability testing to uncover friction points and improve digital journeys before development.',
+        'Create user flows, wireframes, prototypes, and scalable UI in Figma using Auto Layout, components, variants, and reusable patterns.',
+        'Build style guides and design documentation while collaborating with stakeholders and developers to deliver consistent, feasible solutions.'] },
+      { when:'06/2024 — 07/2025', title:'Senior Product Designer & Visual Communication Coordinator', org:'Live Arq. Promocional — São Paulo, Brazil', bullets:[
+        'Led 30+ end-to-end projects, from discovery and requirements through prototyping, validation, and delivery, working across design, production, and technical constraints.',
+        'Introduced iterative prototyping and usability validation, creating 2+ prototypes per project and catching issues earlier in the process.',
+        'Redesigned the validation workflow, reducing revision cycles by 22% and improving overall project efficiency by 30%.',
+        'Coordinated stakeholders and cross-functional teams, managing priorities and design decisions across multiple concurrent projects.'] },
+      { when:'01/2019 — 06/2024', title:'Senior Product Designer', org:'057 Comunicação Visual — São Paulo, Brazil', bullets:[
+        'Delivered approximately 20 projects per year, translating client requirements and business objectives into functional, user-centered solutions from concept through production.',
+        'Led discovery, requirements gathering, prototyping, usability testing, and design validation on selected projects, collaborating closely with clients and technical teams.',
+        'Planned and moderated 5+ usability tests per project using data to identify friction and validate design changes before implementation.',
+        'Improved project delivery efficiency by approximately 25% through earlier validation, iterative feedback, and clearer requirements.'] },
+      { when:'03/2016 — 12/2018', title:'Product Designer', org:'SP Laser — São Paulo, Brazil', bullets:[
+        'Designed physical and visual product solutions for laser engraving and machining, translating client needs into practical, production-ready concepts.',
+        'Applied User-Centered Design while balancing functionality, aesthetics, materials, manufacturing processes, and technical feasibility.'] },
+      { when:'01/2014 — 12/2014', title:'Research Project & Scientific Initiation', org:'Centro Universitário Senac — São Paulo, Brazil', bullets:[
+        'Conducted qualitative research on urban accessibility, exploring the experiences and needs of people with disabilities.',
+        'Translated research findings into actionable design requirements using User-Centered Design and accessibility principles to inform more inclusive solutions.'] }],
+    eduLabel:'EDUCATION',
+    edu:[['01/2026 — 05/2026','Digital Product Design Bootcamp','Tera'],
+      ['09/2025 — 04/2026','User Experience & User Design Bootcamp','Santander Open Academy'],
+      ['01/2012 — 12/2015','Bachelor\u2019s Degree in Product Design','Centro Universitário Senac']],
+    certLabel:'CERTIFICATIONS',
+    certs:['AI Festival Workshop — Tera','UX and Design with AI — Tera','AI UX Lab Workshop — UX Unicórnio','Figma Certification — Kodree','React Specialization — Rocketseat','Fullstack WebDev Bootcamp — Digital House'],
+    skills:[['SOFT SKILLS',['Problem Solving','Team Collaboration','Design Communication','User Empathy','Ownership','Analytical Thinking','Stakeholder Management','Design Thinking','Agile']],
+      ['TECHNICAL SKILLS',['UX Research','Usability Testing','Prototyping','Interaction Design','Design Systems','User Flow','Wireframing','Dev Handoff','Claude']],
+      ['TOOLS',['Figma + FigJam','Figma Make','Notion','Miro','HTML','CSS','JavaScript']],
+      ['LANGUAGES',['Portuguese (Native)','English (C1)','French (Basic)']]]
+  },
+  pt:{
+    title:'Product Designer UX/UI',
+    contact:['+55 (11) 97481-9840','eduardoazuolas@gmail.com','São Paulo, Brasil','linkedin.com/in/eduardo-azuolas','eduardoazuolas.com.br'],
+    summaryLabel:'RESUMO',
+    summary:'Product Designer com mais de 10 anos de experiência resolvendo problemas complexos de design em produtos físicos e digitais. Trago uma abordagem centrada no usuário para pesquisa, design de interação, prototipagem, testes de usabilidade, design visual e design systems, trabalhando de perto com stakeholders e times técnicos. Meu trabalho contribuiu para melhorias mensuráveis, incluindo 12% menos abandono, 22% menos revisões e entregas 25–30% mais rápidas.',
+    expLabel:'EXPERIÊNCIA PROFISSIONAL',
+    exp:[
+      { when:'01/2026 — ATUAL', title:'Product Designer UX/UI', org:'Freelance — São Paulo, Brasil · Remoto', bullets:[
+        'Desenho experiências web e app responsivas, da descoberta à UI de alta fidelidade, transformando necessidades dos usuários e insights de pesquisa em soluções claras e intuitivas.',
+        'Conduzo entrevistas e testes de usabilidade para revelar pontos de atrito e melhorar jornadas digitais antes do desenvolvimento.',
+        'Crio fluxos, wireframes, protótipos e UI escalável no Figma usando Auto Layout, componentes, variants e padrões reutilizáveis.',
+        'Construo style guides e documentação de design, colaborando com stakeholders e desenvolvedores para entregar soluções consistentes e viáveis.'] },
+      { when:'06/2024 — 07/2025', title:'Product Designer Sênior & Coordenador de Comunicação Visual', org:'Live Arq. Promocional — São Paulo, Brasil', bullets:[
+        'Liderei mais de 30 projetos ponta a ponta, da descoberta e requisitos à prototipagem, validação e entrega, atuando entre design, produção e restrições técnicas.',
+        'Introduzi prototipagem iterativa e validação de usabilidade, criando 2+ protótipos por projeto e antecipando a identificação de problemas.',
+        'Redesenhei o fluxo de validação, reduzindo ciclos de revisão em 22% e melhorando a eficiência geral dos projetos em 30%.',
+        'Coordenei stakeholders e times multifuncionais, gerenciando prioridades e decisões de design em vários projetos simultâneos.'] },
+      { when:'01/2019 — 06/2024', title:'Product Designer Sênior', org:'057 Comunicação Visual — São Paulo, Brasil', bullets:[
+        'Entreguei cerca de 20 projetos por ano, traduzindo requisitos de clientes e objetivos de negócio em soluções funcionais e centradas no usuário, do conceito à produção.',
+        'Conduzi descoberta, levantamento de requisitos, prototipagem, testes de usabilidade e validação de design em projetos selecionados, junto a clientes e times técnicos.',
+        'Planejei e moderei 5+ testes de usabilidade por projeto, usando dados para identificar atritos e validar mudanças antes da implementação.',
+        'Melhorei a eficiência de entrega em cerca de 25% com validação antecipada, feedback iterativo e requisitos mais claros.'] },
+      { when:'03/2016 — 12/2018', title:'Product Designer', org:'SP Laser — São Paulo, Brasil', bullets:[
+        'Desenhei soluções de produto físico e visual para gravação e usinagem a laser, traduzindo necessidades dos clientes em conceitos práticos e prontos para produção.',
+        'Apliquei Design Centrado no Usuário equilibrando função, estética, materiais, processos de fabricação e viabilidade técnica.'] },
+      { when:'01/2014 — 12/2014', title:'Projeto de Pesquisa & Iniciação Científica', org:'Centro Universitário Senac — São Paulo, Brasil', bullets:[
+        'Conduzi pesquisa qualitativa sobre acessibilidade urbana, explorando as experiências e necessidades de pessoas com deficiência.',
+        'Traduzi os achados em requisitos de design acionáveis usando Design Centrado no Usuário e princípios de acessibilidade para soluções mais inclusivas.'] }],
+    eduLabel:'FORMAÇÃO',
+    edu:[['01/2026 — 05/2026','Bootcamp de Digital Product Design','Tera'],
+      ['09/2025 — 04/2026','Bootcamp de User Experience & User Design','Santander Open Academy'],
+      ['01/2012 — 12/2015','Bacharelado em Design de Produto','Centro Universitário Senac']],
+    certLabel:'CERTIFICAÇÕES',
+    certs:['AI Festival Workshop — Tera','UX and Design with AI — Tera','AI UX Lab Workshop — UX Unicórnio','Certificação Figma — Kodree','Especialização React — Rocketseat','Bootcamp Fullstack WebDev — Digital House'],
+    skills:[['SOFT SKILLS',['Resolução de problemas','Colaboração em time','Comunicação de design','Empatia com o usuário','Ownership','Pensamento analítico','Gestão de stakeholders','Design Thinking','Agile']],
+      ['HABILIDADES TÉCNICAS',['Pesquisa de UX','Testes de usabilidade','Prototipagem','Design de interação','Design Systems','Fluxo de usuário','Wireframes','Handoff para dev','Claude']],
+      ['FERRAMENTAS',['Figma + FigJam','Figma Make','Notion','Miro','HTML','CSS','JavaScript']],
+      ['IDIOMAS',['Português (nativo)','Inglês (C1)','Francês (básico)']]]
+  }
+};
+
+const RESUME = {
+  en:[['EXPERIENCE',[
+      ['01/2026 — NOW','Product Designer UX/UI','Freelance · São Paulo / Remote','Responsive web and app experiences from discovery to high-fidelity UI. User interviews and usability testing to find friction before development; flows, wireframes, prototypes and scalable UI in Figma; style guides and documentation built with stakeholders and developers.'],
+      ['06/2024 — 07/2025','Senior Product Designer & Visual Communication Coordinator','Live Arq. Promocional · São Paulo','Led 30+ end-to-end projects through discovery, requirements, prototyping, validation and delivery. Introduced iterative prototyping and usability validation (2+ prototypes per project) and redesigned the validation workflow — 22% fewer revision cycles, 30% better project efficiency.'],
+      ['01/2019 — 06/2024','Senior Product Designer','057 Comunicação Visual · São Paulo','Around 20 projects a year, translating client requirements and business objectives into user-centered solutions from concept to production. Planned and moderated 5+ usability tests per project, improving delivery efficiency by roughly 25% through earlier validation.'],
+      ['03/2016 — 12/2018','Product Designer','SP Laser · São Paulo','Physical and visual product solutions for laser engraving and machining. Balanced functionality, aesthetics, materials, manufacturing processes and technical feasibility under a user-centered approach.'],
+      ['01/2014 — 12/2014','Research Project & Scientific Initiation','Centro Universitário Senac','Qualitative research on urban accessibility with people with disabilities, translated into actionable design requirements using accessibility principles.']]],
+    ['EDUCATION',[
+      ['01/2026 — 05/2026','Digital Product Design Bootcamp','Tera',''],
+      ['09/2025 — 04/2026','User Experience & User Interface Bootcamp','Santander Open Academy',''],
+      ['01/2012 — 12/2015','Bachelor\u2019s Degree in Product Design','Centro Universitário Senac','']]],
+    ['CERTIFICATIONS',[
+      ['TERA','AI Festival Workshop · UX and Design with AI','Tera',''],
+      ['UX / AI','AI UX Lab Workshop','UX Unicórnio',''],
+      ['TOOLS','Figma Certification · React Specialization · Fullstack WebDev Bootcamp','Kodree · Rocketseat · Digital House','']]]],
+  pt:[['EXPERIÊNCIA',[
+      ['01/2026 — HOJE','Product Designer UX/UI','Freelance · São Paulo / Remoto','Experiências web e app responsivas, da descoberta à UI de alta fidelidade. Entrevistas e testes de usabilidade para encontrar atritos antes do desenvolvimento; fluxos, wireframes, protótipos e UI escalável no Figma; style guides e documentação junto a stakeholders e desenvolvedores.'],
+      ['06/2024 — 07/2025','Product Designer Sênior & Coordenador de Comunicação Visual','Live Arq. Promocional · São Paulo','Liderei mais de 30 projetos ponta a ponta, da descoberta e requisitos à prototipagem, validação e entrega. Introduzi prototipagem iterativa e validação de usabilidade (2+ protótipos por projeto) e redesenhei o fluxo de validação — 22% menos ciclos de revisão e 30% mais eficiência.'],
+      ['01/2019 — 06/2024','Product Designer Sênior','057 Comunicação Visual · São Paulo','Cerca de 20 projetos por ano, traduzindo requisitos de clientes e objetivos de negócio em soluções centradas no usuário, do conceito à produção. Planejei e moderei 5+ testes de usabilidade por projeto, elevando a eficiência de entrega em cerca de 25%.'],
+      ['03/2016 — 12/2018','Product Designer','SP Laser · São Paulo','Soluções de produto físico e visual para gravação e usinagem a laser. Equilibrei função, estética, materiais, processos de fabricação e viabilidade técnica sob uma abordagem centrada no usuário.'],
+      ['01/2014 — 12/2014','Projeto de Pesquisa & Iniciação Científica','Centro Universitário Senac','Pesquisa qualitativa sobre acessibilidade urbana com pessoas com deficiência, traduzida em requisitos de design acionáveis a partir de princípios de acessibilidade.']]],
+    ['FORMAÇÃO',[
+      ['01/2026 — 05/2026','Bootcamp de Digital Product Design','Tera',''],
+      ['09/2025 — 04/2026','Bootcamp de User Experience & User Interface','Santander Open Academy',''],
+      ['01/2012 — 12/2015','Bacharelado em Design de Produto','Centro Universitário Senac','']]],
+    ['CERTIFICAÇÕES',[
+      ['TERA','AI Festival Workshop · UX and Design with AI','Tera',''],
+      ['UX / IA','AI UX Lab Workshop','UX Unicórnio',''],
+      ['FERRAMENTAS','Certificação Figma · Especialização React · Bootcamp Fullstack WebDev','Kodree · Rocketseat · Digital House','']]]]
+};
+
+const ABOUT = {
+  en:[['FIG. 01 — WHAT I DO','Product design, discovery to handoff','I design responsive web and app experiences end to end: discovery and user interviews, flows and wireframes, high-fidelity UI in Figma, then style guides and documentation that engineers can actually build from. I work in components, variants and reusable patterns because a screen that cannot scale is not a solution.'],
+      ['FIG. 02 — HOW I WORK','Reasoning first, rendering second','I start from the decision the user is trying to make and work backwards to the interface. Research is short and pointed. Exploration is divergent and disposable. I test before development rather than after — usability validation is where I find the expensive mistakes while they are still cheap.'],
+      ['FIG. 03 — WHAT I BRING FROM BEFORE','A decade of designing under real constraints','Ten years designing physical and spatial products left me with one habit that matters here: you cannot repaint a mould after tooling, so you define the mechanism before the surface and validate early. Applied to process, that thinking cut revision cycles by 22% and improved project efficiency by 30%.'],
+      ['FIG. 04 — WHAT I AM LOOKING FOR','Teams that argue about the problem','I am equally comfortable in a startup where I own everything and in a mid-size product org or agency where I own one surface well. What I need is a team that treats the problem statement as the real deliverable. Based in São Paulo, working remotely across time zones.']],
+  pt:[['FIG. 01 — O QUE EU FAÇO','Design de produto, da descoberta ao handoff','Desenho experiências web e app responsivas de ponta a ponta: descoberta e entrevistas, fluxos e wireframes, UI de alta fidelidade no Figma e depois style guides e documentação que o time de engenharia consegue executar. Trabalho com componentes, variants e padrões reutilizáveis, porque uma tela que não escala não é solução.'],
+      ['FIG. 02 — COMO EU TRABALHO','Primeiro o raciocínio, depois o render','Começo pela decisão que o usuário está tentando tomar e volto até a interface. A pesquisa é curta e direta. A exploração é divergente e descartável. Testo antes do desenvolvimento, não depois — a validação de usabilidade é onde encontro os erros caros enquanto ainda são baratos.'],
+      ['FIG. 03 — O QUE EU TRAGO DE ANTES','Uma década projetando sob restrições reais','Dez anos desenhando produtos físicos e espaciais me deixaram um hábito que importa aqui: não se repinta um molde depois da ferramentaria, então você define o mecanismo antes da superfície e valida cedo. Aplicado ao processo, esse raciocínio reduziu ciclos de revisão em 22% e melhorou a eficiência dos projetos em 30%.'],
+      ['FIG. 04 — O QUE EU PROCURO','Times que discutem o problema','Fico igualmente à vontade numa startup onde faço tudo e numa empresa média ou agência onde cuido bem de uma superfície. O que preciso é de um time que trate a definição do problema como a entrega real. Baseado em São Paulo, trabalhando remotamente entre fusos.']]
+};
+
+class Component extends DCLogic {
+  state = { page:'home', cs:0, lang:'en', w:1280, active:'hero', sheet:false, sent:false };
+
+  writeDim(n) {
+    const l = n.querySelector('[data-dim-val]'); if (!l) return;
+    const px = n.getAttribute('data-dim') === 'v' ? n.offsetHeight : n.offsetWidth;
+    l.setAttribute('data-px', px > 0 ? Math.round(px) + ' PX' : '— PX');
+  }
+  measureDims(){
+    if (!this.dimRO && window.ResizeObserver) this.dimRO = new ResizeObserver(es => es.forEach(e => this.writeDim(e.target)));
+    const nodes = document.querySelectorAll('[data-dim]');
+    nodes.forEach(n => {
+      const px = n.getAttribute('data-dim') === 'v' ? n.offsetHeight : n.offsetWidth;
+      if (px > 0 && !n.__dimObs && this.dimRO) { n.__dimObs = 1; this.dimRO.observe(n); }
+      this.writeDim(n);
+    });
+    return nodes.length;
+  }
+  startDims(){
+    if (this.dimTimers) this.dimTimers.forEach(clearTimeout);
+    this.dimTimers = [0, 120, 400, 900, 1600].map(ms => setTimeout(() => this.measureDims(), ms));
+    if (window.MutationObserver && !this.dimMO) {
+      this.dimMO = new MutationObserver(() => {
+        if (this.dimKick) return;
+        this.dimKick = setTimeout(() => { this.dimKick = 0; this.measureDims(); }, 60);
+      });
+      this.dimMO.observe(document.body, { childList:true, subtree:true });
+    }
+  }
+  get reduced(){ return !(this.props.forceMotion ?? false) && !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches); }
+  componentDidMount(){
+    try { const l = localStorage.getItem('pb-lang'); if (l === 'pt' || l === 'en') this.setState({lang:l}); } catch(e){}
+    this.onResize = () => this.setState({ w: window.innerWidth });
+    window.addEventListener('resize', this.onResize);
+    this.startDims();
+    if (window.matchMedia && window.matchMedia('(hover:hover)').matches) {
+      this.onMove = (e) => {
+        const r = document.documentElement.style;
+        if (this.reduced) { if (this.parallaxOn) { this.parallaxOn = false; r.removeProperty('--pbx'); r.removeProperty('--pby'); } return; }
+        this.parallaxOn = true;
+        const cx = e.clientX, cy = e.clientY;
+        if (this.moveRaf) return;
+        this.moveRaf = requestAnimationFrame(() => {
+          this.moveRaf = 0;
+          r.setProperty('--pbx', ((cx / window.innerWidth - .5) * 2).toFixed(3));
+          r.setProperty('--pby', ((cy / window.innerHeight - .5) * 2).toFixed(3));
+        });
+      };
+      window.addEventListener('pointermove', this.onMove, { passive:true });
+    }
+    this.setState({ w: window.innerWidth });
+    this.io = new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting) this.reveal(e.target); }), { threshold:0.08 });
+    this.spy = new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting) this.setState({ active: e.target.getAttribute('data-sec') }); }), { rootMargin:'-42% 0px -52% 0px' });
+    this.scan();
+    this.initDims();
+    this.dimFallback = setTimeout(() => this.initDims(), 500);
+    this.fallback = setTimeout(() => document.querySelectorAll('[data-reveal]').forEach(n => this.reveal(n)), 1400);
+  }
+  initDims(){
+    if (this.reduced) return;
+    document.querySelectorAll('[data-dim]:not([data-dim-ready])').forEach(group => {
+      const r = group.getBoundingClientRect();
+      if (!(r.top < window.innerHeight && r.bottom > -50)) return;
+      if (!group.querySelector('[data-dimline]')) return;
+      group.setAttribute('data-dim-ready', '1');
+    });
+  }
+  componentDidUpdate(prevProps){
+    if (prevProps && prevProps.forceMotion !== this.props.forceMotion && this.reduced) {
+      const r = document.documentElement.style; r.removeProperty('--pbx'); r.removeProperty('--pby'); this.parallaxOn = false;
+    }
+    this.scan(); this.measureDims(); this.initDims();
+    clearTimeout(this.dimFallback); this.dimFallback = setTimeout(() => { this.measureDims(); this.initDims(); }, 500); }
+  componentWillUnmount(){ window.removeEventListener('resize', this.onResize); if(this.onMove) window.removeEventListener('pointermove', this.onMove); clearTimeout(this.fallback); clearTimeout(this.dimFallback); if(this.io) this.io.disconnect(); if(this.spy) this.spy.disconnect(); if(this.dimRO) this.dimRO.disconnect(); if(this.dimMO) this.dimMO.disconnect(); if(this.dimTimers) this.dimTimers.forEach(clearTimeout); }
+
+  reveal(n){ n.style.opacity = 1; n.style.transform = 'none'; if (!this.reduced) { n.querySelectorAll('[data-line]').forEach(l => { l.style.animation = 'pbDraw 1.125s cubic-bezier(.2,.8,.2,1) forwards'; }); } }
+  scan(){
+    if (!this.io) return;
+    document.querySelectorAll('[data-reveal]').forEach(n => { if (this.reduced) { n.style.opacity=1; n.style.transform='none'; } else this.io.observe(n); });
+    document.querySelectorAll('[data-sec]').forEach(n => this.spy.observe(n));
+  }
+  go(page, cs){ this.setState({ page, cs: cs == null ? this.state.cs : cs, sheet:false, active:'hero' }); window.scrollTo({ top:0, behavior:'auto' }); }
+  jump(id){ const el = document.getElementById(id); if (!el) return; const top = el.getBoundingClientRect().top + window.scrollY - 100; window.scrollTo({ top, behavior: this.reduced ? 'auto' : 'smooth' }); }
+  setLang(l){ this.setState({lang:l}); try { localStorage.setItem('pb-lang', l); } catch(e){} }
+
+  renderVals(){
+    const st = this.state, L = st.lang, t = T[L], mob = st.w < 900, narrow = st.w < 680;
+    const cs = CASES[st.cs];
+    const tx = o => (o && typeof o === 'object' && (o.en || o.pt)) ? (o[L] || o.en) : o;
+
+    const navItems = [['home',t.nav.home],['about',t.nav.about],['resume',t.nav.resume],['contact',t.nav.contact]].map(([k,label]) => ({
+      label: narrow ? label.slice(0,3) : label, color: st.page === k ? '#3FD0FF' : '#93A6B8', go: () => this.go(k)
+    }));
+
+    const sections = SECS.map(([key, en, pt], i) => {
+      const thin = (cs.s.thin || []).indexOf(key) >= 0;
+      const body = tx(cs.s[key]);
+      const item = {
+        key, id:'sec-' + key, n: String(i + 3).padStart(2,'0'), label:(L === 'pt' ? pt : en).toUpperCase(),
+        body, size: thin ? '15px' : '17px', pad: thin ? '44px' : '72px', gap: thin ? '14px' : '22px',
+        coord: 'X: ' + (120 + i * 24) + ' Y: ' + (88 + i * 56)
+      };
+      if (thin) item.note = t.thin;
+      if (SLOTS[key] && !thin) {
+        const g = SLOTS[key];
+        item.slots = g.items.map(s => ({ label: s[L] || s.en, h: mob ? (s.dev ? '300px' : '170px') : s.h }));
+        item.slotCols = mob ? (narrow ? '1fr' : 'repeat(2,1fr)') : g.cols;
+      }
+      if (key === 'outcome') {
+        item.metrics = cs.s.metrics.map(m => ({ v:m.v, k: tx(m.k), src: m.proj ? (L==='pt'?'PROJETADO':'PROJECTED') : (L==='pt'?'MEDIDO':'MEASURED') }));
+        item.note = cs.s.metrics.some(m => m.proj) ? t.projected : t.measured;
+      }
+      return item;
+    });
+
+    const index = [['hero', t.secHero],['glance', t.secGlance]].concat(SECS.map(([k, en, pt]) => [k, (L==='pt'?pt:en).toUpperCase()]))
+      .map(([k, label], i) => ({
+        n: String(i + 1).padStart(2,'0'), label,
+        color: st.active === k ? '#3FD0FF' : '#7A8DA0', numColor: st.active === k ? '#3FD0FF' : '#4E6274',
+        go: () => this.jump('sec-' + k), goClose: () => { this.setState({sheet:false}); setTimeout(() => this.jump('sec-' + k), 60); }
+      }));
+
+    const prev = CASES[(st.cs + CASES.length - 1) % CASES.length], next = CASES[(st.cs + 1) % CASES.length];
+
+    return {
+      name: 'Eduardo Azuolas', t,
+      isHome: st.page === 'home', isAbout: st.page === 'about', isCase: st.page === 'cs',
+      isResume: st.page === 'resume', isContact: st.page === 'contact',
+      navItems, goHome: () => this.go('home'), goResume: () => this.go('resume'), goContact: () => this.go('contact'),
+      setEn: () => this.setLang('en'), setPt: () => this.setLang('pt'),
+      enBg: L === 'en' ? '#3FD0FF' : 'transparent', enFg: L === 'en' ? '#04080D' : '#93A6B8',
+      ptBg: L === 'pt' ? '#3FD0FF' : 'transparent', ptFg: L === 'pt' ? '#04080D' : '#93A6B8',
+      cardCols: narrow ? '1fr' : (mob ? 'repeat(2,1fr)' : 'repeat(3,1fr)'),
+      stackCols: narrow ? '1fr' : (mob ? 'repeat(2,1fr)' : (st.page === 'resume' ? 'repeat(2,1fr)' : 'repeat(4,1fr)')),
+      aboutCols: mob ? '1fr' : '1.5fr 1fr',
+      caseCols: mob ? '1fr' : '186px minmax(0,1fr)',
+      specCols: narrow ? 'repeat(2,1fr)' : 'repeat(5,1fr)',
+      hiCols: mob ? '1fr' : 'repeat(3,1fr)',
+      listCols: narrow ? '1fr' : 'repeat(3,1fr)',
+      contactCols: mob ? '1fr' : '1.4fr 1fr',
+      resumeCols: narrow ? '1fr' : '160px 1fr',
+      certCols: narrow ? '1fr' : 'repeat(2,1fr)',
+      motionMode: (this.props.forceMotion ?? false) ? 'full' : 'auto',
+      isPlates: (this.props.workLayout ?? 'plates') !== 'bound',
+      isBound: (this.props.workLayout ?? 'plates') === 'bound',
+      heroArtDisplay: (st.w || 1440) >= 1280 ? 'block' : 'none',
+      heroArtOpacity: '1',
+      heroAnnoDisplay: mob ? 'none' : 'inline',
+      indexDisplay: mob ? 'none' : 'block',
+      rulerDisplay: (st.w || 1440) >= 1360 ? 'flex' : 'none',
+      fabDisplay: mob ? 'block' : 'none',
+      sheetDisplay: st.sheet ? 'block' : 'none',
+      fabLabel: t.indexLabel, toggleSheet: () => this.setState({ sheet: !st.sheet }),
+      cards: CASES.map((c, i) => ({ name:c.name, code:c.code, year:c.year, kind:tx(c.kind), line:tx(c.line), go: () => this.go('cs', i) })),
+      stack: STACK.map(g => { const [label, items] = g[L] || g.en; return { label, items }; }),
+      aboutBlocks: (ABOUT[L] || ABOUT.en).map(([fig, title, body]) => ({ fig, title, body })),
+      aboutStack: [STACK[0],STACK[1],STACK[2],STACK[3],STACK[4],STACK[6]].map(g => { const [label, items] = g[L] || g.en; return { label, items }; }),
+      cv: (function(){ const c = CV[L] || CV.en; return {
+        title:c.title, contact:c.contact, summaryLabel:c.summaryLabel, summary:c.summary,
+        expLabel:c.expLabel, exp:c.exp,
+        eduLabel:c.eduLabel, edu:c.edu.map(e => ({ when:e[0], title:e[1], org:e[2] })),
+        certLabel:c.certLabel, certs:c.certs,
+        skills:c.skills.map(([label, items]) => ({ label, items })) }; })(),
+      cs: { name:cs.name, code:cs.code, kind:tx(cs.kind), line:tx(cs.line),
+        spec: [['role','role'],['duration','duration'],['team','team'],['tools','tools'],['platform','platform']]
+          .map(([k]) => ({ k: t.spec[k], v: tx(cs.spec[k]) })),
+        hi: [{ k:t.kProblem, v:tx(cs.hi.p) }, { k:t.kMove, v:tx(cs.hi.m) }, { k:t.kOutcome, v:tx(cs.hi.o) }] },
+      sections, index,
+      prevName: prev.name, nextName: next.name,
+      prevCase: () => this.go('cs', (st.cs + CASES.length - 1) % CASES.length),
+      nextCase: () => this.go('cs', (st.cs + 1) % CASES.length),
+      resumeHref: 'assets/Resume-Eduardo-Azuolas-Product-Designer-UX-UI.pdf',
+      sendLabel: st.sent ? t.sent : t.send,
+      submit: (e) => {
+        e.preventDefault();
+        const f = e.target.elements;
+        const n = (f.cname && f.cname.value) || '', em = (f.cemail && f.cemail.value) || '', ms = (f.cmessage && f.cmessage.value) || '';
+        const subject = encodeURIComponent((L === 'pt' ? 'Contato pelo portfólio — ' : 'Portfolio enquiry — ') + (n || em));
+        const body = encodeURIComponent(ms + '\n\n— ' + n + (em ? ' · ' + em : ''));
+        window.location.href = 'mailto:eduardoazuolas@gmail.com?subject=' + subject + '&body=' + body;
+        this.setState({ sent:true });
+      }
+    };
+  }
+}
+</script>
+</body>
+</html>

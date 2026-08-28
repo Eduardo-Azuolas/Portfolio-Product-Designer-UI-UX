@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Eduardo Azuolas</title>
+    <script>
+      /*
+       * GitHub Pages has no SPA rewrite: it answers an unknown path with this
+       * file instead of index.html, so /aether would 404 on a hard load or a
+       * shared link. Stash the path in the query string and bounce to the site
+       * root — index.html puts it back before the app reads the URL.
+       *
+       * segmentsToKeep is 0 for a user page (name.github.io) or a custom
+       * domain, and 1 for a project page served from /repo-name/.
+       */
+      var segmentsToKeep = 0;
+
+      var l = window.location;
+      var root = l.pathname.split('/').slice(0, 1 + segmentsToKeep).join('/');
+      var rest = l.pathname.slice(1).split('/').slice(segmentsToKeep).join('/');
+
+      l.replace(
+        l.protocol +
+          '//' +
+          l.hostname +
+          (l.port ? ':' + l.port : '') +
+          root +
+          '/?/' +
+          rest.replace(/&/g, '~and~') +
+          (l.search ? '&' + l.search.slice(1) : '') +
+          l.hash,
+      );
+    </script>
+  </head>
+  <body></body>
+</html>
