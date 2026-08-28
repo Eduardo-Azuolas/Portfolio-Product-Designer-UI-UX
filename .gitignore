@@ -1,0 +1,18 @@
+# Dependencies and build output live under portfolio/, which has its own
+# .gitignore. This file covers the working files that sit beside it.
+
+# Editor and OS noise
+.DS_Store
+Thumbs.db
+*.local
+.vscode/
+.idea/
+
+# Canvas editor preview thumbnail, regenerated on every save
+.thumbnail
+
+# Stray upload artefact
+uploads/
+
+# The CV is served from portfolio/public/assets/; this copy is a duplicate
+assets/Resume-Eduardo-Azuolas-Product-Designer-UX-UI.pdf

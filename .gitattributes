@@ -1,0 +1,9 @@
+# Normalise to LF in the repository. Without this, committing from Windows
+# stores CRLF and every later diff from another machine looks rewritten.
+* text=auto eol=lf
+
+*.png binary
+*.jpg binary
+*.webp binary
+*.pdf binary
+*.svg text eol=lf

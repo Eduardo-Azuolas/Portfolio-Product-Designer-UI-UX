@@ -1,0 +1,89 @@
+/* Design tokens extracted from Portfolio.dc.html.
+   Values are 1:1 with the original canvas — do not drift them casually. */
+:root {
+  /* Surfaces */
+  --bg: #080d13;
+  --surface-plate: #0a1017;
+  --surface-plate-hover: #0d1621;
+  --surface-cell: #0c121a;
+  --surface-cell-hover: #101a26;
+
+  /* Text */
+  --ink: #edf4fa;
+  --ink-muted: #bcd3e4;
+  --ink-dim: #93a6b8;
+
+  /* Mono labels, lightest to darkest.
+     The bottom three were lifted to clear WCAG AA (4.5:1) against every surface
+     they land on — the old #5e7386 / #4e6274 read 3.97 and 3.08 at 9-11px. This
+     background cannot hold six distinct tiers above AA, so 4 through 6 sit
+     closer together than the canvas had them. */
+  --label-1: #9fc2dc;
+  --label-2: #7e97ac;
+  --label-3: #7a8da0;
+  --label-4: #74889b;
+  --label-5: #6e8496;
+  --label-6: #6a8093;
+
+  /* Accent */
+  --accent: #3fd0ff;
+  --accent-hover: #8fe4ff;
+  --accent-active: #00b1eb;
+  --on-accent: #04080d;
+  --live: #35d98b;
+  /* Form validation. Never the only signal — every error carries text too. */
+  --danger: #ff8a8a;
+  --danger-line: rgba(255, 138, 138, 0.55);
+
+  /* Hairlines — the drafting-sheet vocabulary */
+  --rule-faint: rgba(150, 180, 205, 0.14);
+  --rule-soft: rgba(150, 180, 205, 0.16);
+  --rule: rgba(150, 180, 205, 0.22);
+  --rule-dashed: rgba(150, 180, 205, 0.26);
+  --rule-mid: rgba(150, 180, 205, 0.28);
+  --rule-strong: rgba(150, 180, 205, 0.3);
+  --rule-bold: rgba(150, 180, 205, 0.4);
+  --dim-line: rgba(150, 180, 205, 0.34);
+  --dim-tick: rgba(150, 180, 205, 0.5);
+  --bullet: rgba(150, 180, 205, 0.6);
+
+  /* Type */
+  --sans: 'Space Grotesk', Helvetica, Arial, sans-serif;
+  --mono: 'IBM Plex Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+
+  /* Motion */
+  --ease-out: cubic-bezier(0.2, 0.7, 0.2, 1);
+  --ease-draw: cubic-bezier(0.2, 0.8, 0.2, 1);
+  --ease-pop: cubic-bezier(0.16, 0.84, 0.3, 1);
+  /* Every hover/press/focus state shares this, so the whole UI presses back at
+     the same rate. Colour only — nothing here moves, so reduced motion is moot. */
+  --dur-press: 150ms;
+
+  /* Layout */
+  --page-max: 1280px;
+  --page-pad: 24px;
+  /* .header__inner is 14px padding + a 44px control row + 14px + the 1px rule.
+     Anything that has to clear the fixed header derives from this, so changing
+     the header's height in one place moves every anchor with it. */
+  --header-h: 73px;
+  --scroll-offset: calc(var(--header-h) + 24px);
+
+  /* Breakpoints, for reference — media queries cannot read custom properties.
+     680px: phone; every grid is a single column below it.
+     900px: below it the side columns fold under the main one.
+     These are the same two thresholds useViewport reports as narrow / mob. */
+
+  /* Spacing, for reference — every margin, padding and gap in the sheet sits on
+     a 2px lattice: 2 4 6 8 10 12 14 16 18 20 22 24 26 28 30 34 38 40 44 48 52
+     56 60 72 80 88 96 120 140 150. The only exception is the 1px hairline,
+     which is the drafting vocabulary itself, not a spacing value. New work
+     picks a step off that ladder rather than inventing one.
+
+     Type — ten static sizes:
+     10 11 12  mono micro-labels, uppercase and short (SPEC-001, 2024, OPEN
+               SHEET). Below the usual 12px floor on purpose: this is the
+               drafting convention, and they clear AA contrast.
+     14 15 16 17  body copy, never smaller than 14.
+     20 26 34     block titles.
+     Page titles are clamp() and scale with the viewport instead. */
+}

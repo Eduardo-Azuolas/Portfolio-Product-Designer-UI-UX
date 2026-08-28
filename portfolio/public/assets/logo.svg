@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="Eduardo Azuolas">
+  <!-- Favicon build of the EA monogram. Square field with the plate colour
+       behind it: a bare mark would vanish against a light tab strip. Colours
+       are literal here — a favicon inherits nothing from the page. -->
+  <rect width="64" height="64" rx="10" fill="#080d13"/>
+  <g transform="translate(0,11)" fill="#edf4fa">
+    <path d="M0 0h9v42H0z"/>
+    <path d="M0 0h40l-4.95 8H0z"/>
+    <path d="M0 17h29.5l-5 8H0z"/>
+    <path d="M0 34h19l-5 8H0z"/>
+    <path d="M42.5 0H52L26 42h-9.5z"/>
+    <path d="M42.5 0H52l12 42h-9.5z"/>
+    <path d="M26.4 26h33l2.3 8H21.45z"/>
+  </g>
+</svg>
