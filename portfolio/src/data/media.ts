@@ -14,6 +14,19 @@ function paths(caseId: string) {
   };
 }
 
+/**
+ * Three phones across a band, on a shared baseline. `PHONE_X` are the left
+ * edges; 28 wide leaves a 2-unit gap between frames and a 6-unit margin at each
+ * end. `PHONE_Y` drops them just far enough for the ground to read as a mount
+ * rather than a gap.
+ */
+const PHONE_X = [6, 36, 66];
+const PHONE_W = 28;
+const PHONE_Y = 8;
+
+/** One desktop screen, near full width, with the ground as a hairline margin. */
+const DESK = { x: 4, width: 92, y: 6 };
+
 const { both } = paths('investiq');
 
 /**
@@ -21,6 +34,16 @@ const { both } = paths('investiq');
  * Sizes are the exported asset's own pixels, not the display size.
  */
 const investiq: CaseMedia = {
+  // Landing, dashboard, risk profile — the pitch, the payoff, and the step that
+  // earns it. ui-06 is the obvious third but its suggestion rows still carry
+  // empty placeholder boxes, so it stays off the front page.
+  thumb: {
+    shots: [
+      { src: both('ui-01'), w: 780, h: 1864, x: PHONE_X[0], width: PHONE_W, y: PHONE_Y },
+      { src: both('ui-03'), w: 780, h: 1466, x: PHONE_X[1], width: PHONE_W, y: PHONE_Y },
+      { src: both('ui-05'), w: 780, h: 1190, x: PHONE_X[2], width: PHONE_W, y: PHONE_Y },
+    ],
+  },
   // The persona strip and the competitor table are 1240pt-wide documents; at
   // half column width their text is unreadable, so research runs full width.
   cols: { problem: '1fr', research: '1fr', insights: '1fr', strategy: '1fr' },
@@ -112,6 +135,9 @@ const pulsePaths = paths('pulse');
  * crops taken from the full-page export at known coordinates.
  */
 const pulse: CaseMedia = {
+  // Connect Data is 2.16:1 — it lands in the band almost whole, where the
+  // analysis screen would have to be cropped around its empty chart card.
+  thumb: { shots: [{ src: pulsePaths.both('ui-01'), w: 1936, h: 897, ...DESK }] },
   // Every artefact here is a 1280pt-wide document or a 1440pt desktop screen.
   // At half column width their text stops being readable, so they run full
   // width; only the lo-fi wireframes tolerate two columns.
@@ -216,6 +242,7 @@ const reloopPaths = paths('reloop');
  * against the portfolio's dark page.
  */
 const reloop: CaseMedia = {
+  thumb: { shots: [{ src: reloopPaths.both('ui-01'), w: 1936, h: 1346, ...DESK }] },
   // 1440pt desktop screens and 1280pt documents: at half column width their
   // text stops being readable. Only the lo-fi wireframes take two columns.
   cols: {
@@ -313,6 +340,17 @@ const forgePaths = paths('forge');
  * Its pages are single tall frames, so most figures are region crops.
  */
 const forge: CaseMedia = {
+  // The system sheet, not the board. This case is a design system, so the
+  // primary scale and the semantic set are the subject — and unlike the kanban's
+  // card titles, swatches still read at 400px. Doubled and pinned to the top
+  // left so the crop lands on the colour blocks and stops above CORE ICONS,
+  // whose glyphs are still empty circles in the export.
+  // The component health dashboard, on the same DESK mount as Pulse and Reloop.
+  // It carries the case's actual argument — token drift and adoption across the
+  // eight teams the summary line names — where the kanban board only says
+  // "project tool". It also survives the scale: the three counters and the six
+  // drift bars stay readable at 380px, which card titles do not.
+  thumb: { shots: [{ src: forgePaths.both('ui-04'), w: 1936, h: 1127, ...DESK }] },
   cols: {
     problem: 'repeat(2,1fr)',
     research: '1fr',
@@ -392,6 +430,15 @@ const aetherPaths = paths('aether');
  * directly on the sheet; the screens keep their own ground.
  */
 const aether: CaseMedia = {
+  // Wallet education, guided transaction, activity. Not ui-01 — its app mark is
+  // still a flat placeholder circle.
+  thumb: {
+    shots: [
+      { src: aetherPaths.both('ui-02'), w: 780, h: 1688, x: PHONE_X[0], width: PHONE_W, y: PHONE_Y },
+      { src: aetherPaths.both('ui-03'), w: 780, h: 1688, x: PHONE_X[1], width: PHONE_W, y: PHONE_Y },
+      { src: aetherPaths.both('ui-06'), w: 780, h: 1688, x: PHONE_X[2], width: PHONE_W, y: PHONE_Y },
+    ],
+  },
   // The definition strip is a 1200pt-wide document — half a column would make
   // its body copy unreadable, so research runs full width.
   cols: { research: '1fr' },
@@ -558,6 +605,16 @@ const casadoPaths = paths('casado');
  * leave dark type floating on the dark sheet.
  */
 const casado: CaseMedia = {
+  // Catalog, product detail, pickup calendar — and the calendar is the case's
+  // whole argument. The cart and checkout frames are the obvious middle steps
+  // but both run out of content half way down the phone.
+  thumb: {
+    shots: [
+      { src: casadoPaths.both('cui-01'), w: 750, h: 1624, x: PHONE_X[0], width: PHONE_W, y: PHONE_Y },
+      { src: casadoPaths.both('cui-02'), w: 750, h: 1624, x: PHONE_X[1], width: PHONE_W, y: PHONE_Y },
+      { src: casadoPaths.both('cui-05'), w: 750, h: 1624, x: PHONE_X[2], width: PHONE_W, y: PHONE_Y },
+    ],
+  },
   // The persona strip and the journey map are 1200pt-wide documents; at half a
   // column their body copy stops being readable.
   cols: { research: '1fr' },

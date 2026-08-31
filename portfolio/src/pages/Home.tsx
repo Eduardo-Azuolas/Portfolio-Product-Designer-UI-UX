@@ -1,5 +1,6 @@
 import { config } from '../config';
 import { CASES } from '../data/cases';
+import { MEDIA } from '../data/media';
 import { DimH, DimV } from '../components/Dim';
 import { FigRule } from '../components/FigRule';
 import { HeroArt } from '../components/HeroArt';
@@ -17,9 +18,34 @@ type Props = {
 };
 
 export function Home({ t, lang, vp, onNavigate, onOpenCase }: Props) {
-  const cards = CASES.map((c, i) => (
+  const cards = CASES.map((c, i) => {
+    const thumb = MEDIA[c.id]?.thumb;
+
+    return (
     <button key={c.id} type="button" className="plate" onClick={() => onOpenCase(i)}>
       <span className="plate__corner" aria-hidden="true" />
+      {thumb && (
+        <span
+          className="plate__thumb"
+          style={thumb.ground ? { background: thumb.ground } : undefined}
+        >
+          {thumb.shots.map((shot, s) => (
+            <img
+              key={s}
+              className="plate__shot"
+              src={pick(shot.src, lang)}
+              // The plate already names the case twice, in the kind line and the
+              // heading. A third reading of it here would be noise.
+              alt=""
+              width={shot.w}
+              height={shot.h}
+              loading="lazy"
+              decoding="async"
+              style={{ left: `${shot.x}%`, width: `${shot.width}%`, top: `${shot.y ?? 0}%` }}
+            />
+          ))}
+        </span>
+      )}
       <div className="plate__kind">{pick(c.kind, lang)}</div>
       <div data-line className="plate__rule" />
       <h3 className="plate__name">{c.name}</h3>
@@ -31,7 +57,8 @@ export function Home({ t, lang, vp, onNavigate, onOpenCase }: Props) {
         <span>{t.openSheet}</span>
       </div>
     </button>
-  ));
+    );
+  });
 
   return (
     <main className="page">
