@@ -492,6 +492,39 @@
   );
 }
 
+/* The drawing on the sheet. It bleeds past the plate's 22px padding to the
+   three edges it touches; the plate's own clip-path keeps the cut corner.
+
+   The frames are mounted on this ground rather than filling it: a phone screen
+   and a 1440pt desktop screen want opposite treatments, and letting the ground
+   show as a margin is what makes six different products read as one grid. Each
+   shot is placed from data — see ThumbShot. */
+.plate__thumb {
+  display: block;
+  position: relative;
+  margin: -22px -22px 20px;
+  aspect-ratio: 2.2 / 1;
+  overflow: hidden;
+  border-bottom: 1px solid var(--rule);
+  background: var(--surface-cell);
+}
+.plate__shot {
+  display: block;
+  position: absolute;
+  height: auto;
+  /* A hairline on every frame, light or dark, so the mount is the same gesture
+     across the grid — and so the light screens stop butting straight onto the
+     ground with no edge. */
+  outline: 1px solid var(--rule-soft);
+  outline-offset: -1px;
+  /* Sits back until the plate is hovered, so six screens at once read as one
+     grid instead of six competing images. */
+  opacity: 0.94;
+  transition: opacity var(--dur-press) var(--ease-out);
+}
+.plate:hover .plate__shot,
+.plate:focus-visible .plate__shot { opacity: 1; }
+
 .plate__kind {
   font-family: var(--mono);
   font-size: 10px;

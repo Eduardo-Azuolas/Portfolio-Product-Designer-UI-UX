@@ -1094,3 +1094,132 @@ Dois achados do agente foram descartados apos verificacao:
 ## Mantido de proposito
 `Portfolio.dc.html`, `support.js`, `assets/Logo.jpg` sao fonte do port e origem
 do monograma. Fora do build, mas apagar perde proveniencia.
+
+---
+
+# Auditoria de portfolio — correcoes 1 e 3 (2026-08-31)
+
+## Correcao previa da auditoria (2 achados meus estavam errados)
+
+- **Contraste NAO esta quebrado.** O `a11y` do axe devolveu `violations: 0` e
+  11 nos em `incomplete` (contraste "precisa de revisao manual") — o axe nao
+  consegue calcular atraves do `backdrop-filter` do header e do canvas de fundo,
+  entao desiste e marca incomplete. Eu li isso como problema. Medido a mao
+  contra `--bg #080d13`: `--ink` 17.56:1, `--ink-muted` (corpo dos cases)
+  12.60:1, `--ink-dim` (nav) 7.79:1, `--accent` 10.84:1, `--label-6` (o mais
+  escuro) 4.75:1. Tudo passa AA, quase tudo passa AAA. O comentario em
+  `tokens.css` ja registrava isso. **Nada a fazer.**
+- **A secao DESIGN SYSTEM ja mostra, nao so descreve.** `ds.webp` tem swatches
+  com hex, a escala tipografica renderizada em tamanho real e a biblioteca de
+  componentes (button states, input fields, asset tags). Nunca vi na auditoria
+  porque a imagem nao tinha feito reveal no scroll. **Nada a fazer.**
+
+Sobra do fix 3 apenas o item dos placeholders — e ele nao e codigo (ver F3).
+
+## F1 — Trabalho na home (thumbnails nas plates)
+
+Hoje `FIG. 02 — SELECTED WORK` sao 6 plates so de texto. Os assets ja existem
+em `dist/assets/cases/<id>/<lang>/ui-*.webp`; e so usar.
+
+- [x] F1.1 `types.ts`: novo tipo `Thumb = { src: MaybeLocalized; w: number; h: number }`
+      e campo `thumb?: Thumb` em `CaseMedia`. Nao reusar `SlotImage` — ele exige
+      `caption`, e a plate ja tem nome e kind.
+- [x] F1.2 `media.ts`: `thumb` nos 6 cases, apontando para o frame mais
+      reconhecivel de cada um (candidatos: investiq `ui-03` dashboard, pulse
+      `ui-05`, aether `ui-01`, forge `ui-01` kanban, casado `cui-01`, reloop
+      `ui-01`). Conferir cada um renderizado antes de fechar — se um frame nao
+      ler bem em ~380px de largura, troco.
+- [x] F1.3 `Home.tsx`: janela de imagem no topo da plate, antes de `plate__kind`.
+      A metafora da prancha pede o desenho no campo e o title block embaixo —
+      que e exatamente o que a plate ja faz com `plate__foot`.
+- [x] F1.4 `app.css`: `.plate__thumb` sangrando ate a borda (a plate tem
+      `padding: 22px 22px 0`, entao margem negativa), `aspect-ratio` fixo,
+      `object-fit: cover` + `object-position: top`, hairline embaixo. Respeitar
+      o `clip-path` do canto cortado. Hover discreto, alinhado com `--dur-press`.
+- [x] F1.5 `width`/`height` intrinsecos + `loading="lazy"` fora da primeira
+      dobra. Medir CLS depois — hoje esta em 0 e tem que continuar.
+- [x] F1.6 Mobile (<=680px): conferir que a janela nao come a dobra inteira.
+- [x] F1.7 Build + revisar as 6 plates em 1440px e 390px, EN e PT.
+
+Risco conhecido: os fontes tem proporcoes muito diferentes (mobile retrato
+780x1864 vs desktop 1936x897). Numa janela unica com `cover`, o retrato mostra
+so a faixa de cima. Se ficar ruim, adiciono `focus?: string` no `Thumb` para
+ajustar `object-position` caso a caso.
+
+## F3 — Placeholders (NAO e tarefa de codigo)
+
+Confirmado na resolucao original, nao e artefato de screenshot:
+`investiq/en/ui-06.webp` tem, nas 4 linhas de sugestao, um quadrado de icone
+vazio a esquerda e um retangulo vazio a direita. Achado novo: em
+`investiq/en/ds.webp` os rotulos dos swatches ("Primary Emerald", "Raised
+Surface", "Deep Canvas", "Soft Outline") sao texto quase branco sobre fundo
+branco — ilegiveis.
+
+Os dois defeitos estao *dentro* dos webp exportados do Figma. Codigo nao
+resolve; precisa reexportar. Portanto:
+
+- [x] F3.1 Varrer os webp dos 6 cases e listar exatamente arquivo + regiao com
+      caixa placeholder ou texto ilegivel.
+- [x] F3.2 Entregar a lista de reexport (arquivo, idioma, o que corrigir).
+      Reexportar em si e no Figma — fora do meu alcance.
+
+## F3 — Lista de reexport (Figma)
+
+Revisei a fundo 18 frames EN cobrindo os 6 cases (todos os `ds*`, todos os
+`ui-*` do InvestIQ, e amostra dos demais). Os defeitos caem em 5 padroes. Nada
+disso e corrigivel em codigo — sao pixels dentro do webp.
+
+### P1 — Caixas/circulos placeholder vazios dentro de telas acabadas
+- `investiq/{en,pt}/ui-01` — faixa "FEATURED IN": 3 pilulas cinza vazias.
+  Avatar do topo direito e o stack de 3 circulos verdes acima de "+12,000
+  investors" tambem sem conteudo.
+- `investiq/{en,pt}/ui-06` — nas 4 linhas de sugestao: quadrado de icone vazio
+  a esquerda + retangulo vazio a direita. O mais visivel do site.
+- `pulse/{en,pt}/ui-05` — card "Volume vs Target History" e uma caixa vazia.
+- `pulse/{en,pt}/ui-06` — "Transaction Volume" e "Regional Distribution" sao
+  duas caixas vazias. Produto de analytics com os graficos em branco.
+- `aether/{en,pt}/ds` — "CORE ICONS": 8 circulos vazios (bubble_chart, wallet,
+  guide, settings, nodes, assets, network, security).
+- `forge/{en,pt}/ds` — "CORE ICONS": 8 circulos vazios (task, sprint, board,
+  token, component, avatar, filter, tag).
+- `aether/{en,pt}/ui-01` — o logo do app e um circulo lavanda chapado, sem
+  marca dentro.
+- `casado/{en,pt}/ds-components` e as telas `dui-*` — icones da tab bar sao
+  quadrados arredondados solidos, sem glifo.
+- `reloop/{en,pt}/ui-02` — avatar do vendedor (@marina.closet) e circulo vazio.
+
+### P2 — Rotulos de swatch ilegiveis (texto quase branco sobre fundo branco)
+- `investiq/{en,pt}/ds` — "Primary Emerald", "Raised Surface", "Deep Canvas",
+  "Soft Outline".
+- `pulse/{en,pt}/ds` — "Deep Canvas", "Surface", "Pulse Blue", "Success Green",
+  "Alert Red", "Pending Amber".
+Os hex abaixo deles estao legiveis; so o nome do token quebrou.
+Referencia de como deveria ser: `casado/ds-colors` esta perfeito.
+
+### P3 — Instrucao de autoria esquecida no export
+- `pulse/{en,pt}/ds`, canto inferior direito: **"FIG. 00 — FOUNDATIONS (DROP
+  IMAGE H"** — nota para si mesmo, e ainda cortada no meio da palavra.
+  Remover antes de reexportar.
+
+### P4 — Texto com artefato de renderizacao
+- `aether/{en,pt}/ds` — todos os titulos de secao ("COLOR PALETTE",
+  "TYPOGRAPHY", "CORE ICONS", "COMPONENT LIBRARY", "BRAND IDENTITY",
+  "Accessibility"), os nomes/hex dos swatches, o label "Primary Action" e o
+  badge "FAILED" saem com halo/duplicacao. Parece fonte nao embutida caindo em
+  fallback com bold sintetico. Primeiro swatch ("Primary Surface #1E1E2E") nao
+  tem chip visivel — escuro sobre escuro sem borda.
+- `aether/{en,pt}/ui-06` — o numeral grande "1" sai com o glifo quebrado.
+
+### P5 — Frame cortado / area morta
+- `forge/{en,pt}/ds` — coluna "Input Fields" cortada na borda direita: o campo
+  "Email / Invalid format" fica pela metade. Bounds do export apertados demais.
+- `aether/{en,pt}/ds` — card do component library cortado embaixo, "Network
+  Latency 24ms" pela metade.
+- `casado/{en,pt}/dui-01` e `dui-03` — ~50% da tela e branco vazio abaixo do
+  conteudo. Le como tela inacabada, nao como respiro.
+
+### Observacao (nao e defeito, e inconsistencia)
+`reloop/{en,pt}/ds` e so uma folha de componentes com rotulos genericos
+("Button label", "Nav label", "Tab label", "Placeholder text") — sem paleta,
+sem escala tipografica, sem titulos de secao. Muito mais raso que o ds dos
+outros cases. `casado/ds-colors` e `forge/ds` sao o padrao a seguir.
