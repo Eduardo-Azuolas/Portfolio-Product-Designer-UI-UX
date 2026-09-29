@@ -1,6 +1,9 @@
 import { useEffect, useRef, useState } from 'react';
 import { config } from '../config';
+import { routeHref } from '../hooks/useRoute';
+import { useActiveSection } from '../hooks/useScrollSpy';
 import { Logo } from './Logo';
+import { RouteLink } from './RouteLink';
 import type { Strings } from '../i18n/strings';
 import type { Lang, Page } from '../types';
 
@@ -15,18 +18,51 @@ type Props = {
   onLang: (lang: Lang) => void;
 };
 
-const NAV: ReadonlyArray<Exclude<Page, 'cs'>> = ['home', 'about', 'resume', 'contact'];
+const NAV: ReadonlyArray<Exclude<Page, 'cs' | 'notfound'>> = ['home', 'about', 'resume', 'contact'];
+const LANGS: ReadonlyArray<Lang> = ['en', 'pt'];
+
+type Item = {
+  key: string;
+  label: string;
+  href: string;
+  /**
+   * "page" for the page itself, "location" for the home section being read,
+   * "true" for the section a case belongs to.
+   */
+  current?: 'page' | 'location' | 'true';
+  onClick: () => void;
+};
 
 export function Header({ page, t, lang, mob, onNavigate, onWork, onLang }: Props) {
+  const section = useActiveSection();
+  // On the home sheet, HOME and WORK hand the mark back and forth as the work
+  // section scrolls through the reading band.
+  const onWorkSection = page === 'home' && section === 'work';
   const menuRef = useRef<HTMLDialogElement>(null);
   const [menuOpen, setMenuOpen] = useState(false);
 
   /* WORK is a section of the home sheet, not a page, so it rides along with
-     HOME rather than owning a route of its own. */
-  const items = NAV.flatMap((key) => {
-    const item = { key, label: t.nav[key], current: page === key, onClick: () => onNavigate(key) };
+     HOME rather than owning a route of its own. A case sheet lives under it,
+     so that is where the "you are here" mark goes while reading one. */
+  const items: Item[] = NAV.flatMap((key) => {
+    const item: Item = {
+      key,
+      label: t.nav[key],
+      href: routeHref(key),
+      current: page === key && !(key === 'home' && onWorkSection) ? 'page' : undefined,
+      onClick: () => onNavigate(key),
+    };
     return key === 'home'
-      ? [item, { key: 'work', label: t.nav.work, current: false, onClick: onWork }]
+      ? [
+          item,
+          {
+            key: 'work',
+            label: t.nav.work,
+            href: `${routeHref('home')}#work`,
+            current: page === 'cs' ? 'true' : onWorkSection ? 'location' : undefined,
+            onClick: onWork,
+          },
+        ]
       : [item];
   });
 
@@ -52,17 +88,22 @@ export function Header({ page, t, lang, mob, onNavigate, onWork, onLang }: Props
 
   return (
     <>
+      {/* First stop for keyboard users: past the eight header controls. */}
+      <a className="skip-link" href="#content">
+        {t.skip}
+      </a>
+
       <header data-noprint className="header">
         <div className="header__inner">
-          <button
-            type="button"
+          <RouteLink
             className="brand"
+            href={routeHref('home')}
             aria-label={config.name}
-            onClick={() => onNavigate('home')}
+            onNavigate={() => onNavigate('home')}
           >
             <Logo />
             <span className="brand__name">{config.name}</span>
-          </button>
+          </RouteLink>
 
           <div className="header__spacer" />
 
@@ -73,36 +114,35 @@ export function Header({ page, t, lang, mob, onNavigate, onWork, onLang }: Props
             them out in full — no three-letter abbreviations to decipher.
           */}
           <nav className="nav" aria-label={t.menu}>
-            {items.map(({ key, label, current, onClick }) => (
-              <button
+            {items.map(({ key, label, href, current, onClick }) => (
+              <RouteLink
                 key={key}
-                type="button"
                 className="nav__btn"
-                aria-current={current ? 'page' : undefined}
-                onClick={onClick}
+                href={href}
+                aria-current={current}
+                onNavigate={onClick}
               >
                 {label}
-              </button>
+              </RouteLink>
             ))}
           </nav>
 
-          <div className="lang">
-            <button
-              type="button"
-              className="lang__btn"
-              aria-pressed={lang === 'en'}
-              onClick={() => onLang('en')}
-            >
-              EN
-            </button>
-            <button
-              type="button"
-              className="lang__btn"
-              aria-pressed={lang === 'pt'}
-              onClick={() => onLang('pt')}
-            >
-              PT
-            </button>
+          <div className="lang" role="group" aria-label={t.langGroup}>
+            {LANGS.map((code) => (
+              <button
+                key={code}
+                type="button"
+                lang={code}
+                className="lang__btn"
+                aria-pressed={lang === code}
+                onClick={() => onLang(code)}
+              >
+                {code.toUpperCase()}
+                {/* The visible code stays in the name, so voice control can
+                    still say "click PT". */}
+                <span className="sr-only"> — {t.langNames[code]}</span>
+              </button>
+            ))}
           </div>
 
           <button
@@ -143,16 +183,16 @@ export function Header({ page, t, lang, mob, onNavigate, onWork, onLang }: Props
         </div>
 
         <nav className="menu__list" aria-label={t.menu}>
-          {items.map(({ key, label, current, onClick }) => (
-            <button
+          {items.map(({ key, label, href, current, onClick }) => (
+            <RouteLink
               key={key}
-              type="button"
               className="menu__btn"
-              aria-current={current ? 'page' : undefined}
-              onClick={choose(onClick)}
+              href={href}
+              aria-current={current}
+              onNavigate={choose(onClick)}
             >
               {label}
-            </button>
+            </RouteLink>
           ))}
         </nav>
       </dialog>

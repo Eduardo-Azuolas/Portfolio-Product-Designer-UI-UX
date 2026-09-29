@@ -14,9 +14,9 @@ export function About({ t, lang, vp }: Props) {
   const stack = stackFor(lang, ABOUT_STACK);
 
   return (
-    <main className="page page--about">
+    <main id="content" tabIndex={-1} className="page page--about">
       <div data-reveal className="reveal">
-        <FigRule label={`SHEET 02 — ${t.aboutLabel}`} style={{ marginBottom: 26 }} />
+        <FigRule prefix={`${t.sheet} 02`} label={t.aboutLabel} style={{ marginBottom: 26 }} />
 
         <div className="about__head">
           <div>
@@ -35,9 +35,15 @@ export function About({ t, lang, vp }: Props) {
           */}
           <figure className="portrait">
             <div className="portrait__disc">
+              {/*
+                The disc never renders wider than 320px, so a 1x screen takes
+                the 320 file and only a 2x screen pulls the 560.
+              */}
               <img
                 className="portrait__img"
                 src={`${import.meta.env.BASE_URL}assets/portrait.webp`}
+                srcSet={`${import.meta.env.BASE_URL}assets/portrait-320.webp 320w, ${import.meta.env.BASE_URL}assets/portrait.webp 560w`}
+                sizes="320px"
                 alt={t.portraitAlt}
                 width={560}
                 height={560}

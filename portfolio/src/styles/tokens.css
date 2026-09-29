@@ -43,6 +43,9 @@
   --rule-mid: rgba(150, 180, 205, 0.28);
   --rule-strong: rgba(150, 180, 205, 0.3);
   --rule-bold: rgba(150, 180, 205, 0.4);
+  /* The edge of anything you can operate — inputs, the language pair, ghost
+     buttons. 3.4:1 on every surface, the WCAG 1.4.11 floor is 3:1. */
+  --rule-control: rgba(150, 180, 205, 0.55);
   --dim-line: rgba(150, 180, 205, 0.34);
   --dim-tick: rgba(150, 180, 205, 0.5);
   --bullet: rgba(150, 180, 205, 0.6);
@@ -79,10 +82,10 @@
      which is the drafting vocabulary itself, not a spacing value. New work
      picks a step off that ladder rather than inventing one.
 
-     Type — ten static sizes:
-     10 11 12  mono micro-labels, uppercase and short (SPEC-001, 2024, OPEN
-               SHEET). Below the usual 12px floor on purpose: this is the
-               drafting convention, and they clear AA contrast.
+     Type — static sizes:
+     12        mono micro-labels, uppercase and short (SPEC-001, 2024, VIEW
+               CASE). 12px is the floor: the 10-11px drafting labels were
+               raised after the 2026-09 audit, legibility over convention.
      14 15 16 17  body copy, never smaller than 14.
      20 26 34     block titles.
      Page titles are clamp() and scale with the viewport instead. */

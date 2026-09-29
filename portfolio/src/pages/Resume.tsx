@@ -12,10 +12,13 @@ export function Resume({ t, lang, vp }: Props) {
   const cv = CV[lang] ?? CV.en;
 
   return (
-    <main className="page page--resume">
+    <main id="content" tabIndex={-1} className="page page--resume">
       <div data-reveal className="reveal resume__head">
         <div>
-          <div className="resume__sheet">SHEET 04 — {t.resumeLabel}</div>
+          <div className="resume__sheet">
+            <span aria-hidden="true">{t.sheet} 04 — </span>
+            {t.resumeLabel}
+          </div>
           <div data-title-exit className="title-exit">
             <DimV show={vp.rulers} />
             <h1 className="resume__title">{config.name}</h1>
@@ -27,8 +30,6 @@ export function Resume({ t, lang, vp }: Props) {
           className="btn btn--primary resume__download"
           href={config.resumeHref}
           download
-          target="_blank"
-          rel="noreferrer"
         >
           {t.downloadResume}
         </a>
@@ -51,7 +52,7 @@ export function Resume({ t, lang, vp }: Props) {
                 <div>
                   <h3 className="res-row__title">{row.title}</h3>
                   <div className="res-row__org">{row.org}</div>
-                  <ul className="res-row__bullets">
+                  <ul role="list" className="res-row__bullets">
                     {row.bullets.map((b) => (
                       <li key={b} className="bullet">
                         {b}
@@ -81,7 +82,7 @@ export function Resume({ t, lang, vp }: Props) {
 
         <section data-reveal className="reveal reveal--sm">
           <FigRule tight as="h2" label={cv.certLabel} style={{ marginBottom: 18 }} />
-          <ul className="res-certs">
+          <ul role="list" className="res-certs">
             {cv.certs.map((c) => (
               <li key={c} className="res-cert">
                 {c}
@@ -96,7 +97,7 @@ export function Resume({ t, lang, vp }: Props) {
             {cv.skills.map((g) => (
               <div key={g.label} className="skill-cell">
                 <div className="skill-cell__label">{g.label}</div>
-                <ul className="skill-cell__list">
+                <ul role="list" className="skill-cell__list">
                   {g.items.map((i) => (
                     <li key={i} className="skill-cell__item">
                       {i}

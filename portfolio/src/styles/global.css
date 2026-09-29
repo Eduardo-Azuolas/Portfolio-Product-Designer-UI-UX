@@ -5,14 +5,33 @@
 
 html, body { margin: 0; padding: 0; background: var(--bg); }
 
+/* Keyboard focus and in-page jumps never land under the fixed header or the
+   case FAB. */
+html { scroll-padding-top: var(--scroll-offset); scroll-padding-bottom: 88px; }
+
 body {
   font-family: var(--sans);
   color: var(--ink);
   -webkit-font-smoothing: antialiased;
 }
 
-a { color: var(--accent); text-decoration: none; }
-a:hover { color: var(--accent-hover); }
+/* Zero specificity: links styled as buttons, plates or nav items keep their
+   own colours instead of turning accent on hover. */
+:where(a) { color: var(--accent); text-decoration: none; }
+:where(a):hover { color: var(--accent-hover); }
+
+/* Text for screen readers only. */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
+}
 
 ::selection { background: rgba(63, 208, 255, 0.26); }
 
@@ -25,11 +44,19 @@ a:hover { color: var(--accent-hover); }
   outline: 2px solid var(--accent);
   outline-offset: 2px;
 }
+/* Titles and <main> receive focus only programmatically, after a route change
+   or a skip link. A ring around a whole heading or page is noise. */
+:where(main, h1, h2)[tabindex='-1']:focus { outline: none; }
 
 /* ── Keyframes ────────────────────────────────────────────────────────── */
 @keyframes pbDraw { from { transform: scaleX(0); } to { transform: scaleX(1); } }
-@keyframes pbProgress { from { width: 0; } to { width: 100%; } }
-@keyframes pbDrift { from { background-position: 0 0; } to { background-position: 0 -240px; } }
+/* Scale, not width: a scroll-driven transform runs on the compositor, a width
+   re-lays the page out on every scroll frame. */
+@keyframes pbProgress { from { transform: scaleX(0); } to { transform: scaleX(1); } }
+/* The backdrop grids slide rather than repaint: animating background-position
+   repainted two full-screen layers on every scroll frame. 240px is a whole
+   number of both grid pitches (16px and 80px), so the slide reads the same. */
+@keyframes pbDrift { from { translate: 0 0; } to { translate: 0 -240px; } }
 @keyframes pbDimX { from { transform: scaleX(0); } to { transform: scaleX(1); } }
 @keyframes pbDimY { from { transform: scaleY(0); } to { transform: scaleY(1); } }
 @keyframes pbFadeIn { from { opacity: 0; } to { opacity: 1; } }
@@ -60,7 +87,7 @@ a:hover { color: var(--accent-hover); }
 }
 @keyframes pbNudge { 0%, 100% { transform: translateX(0); } 50% { transform: translateX(2.5px); } }
 @keyframes pbPulse { 0%, 100% { opacity: 0.32; } 50% { opacity: 0.7; } }
-@keyframes pbTitleExit { from { opacity: 1; transform: translateY(0); } to { opacity: 0.28; transform: translateY(-22px); } }
+@keyframes pbTitleExit { from { opacity: 1; transform: translateY(0); } to { opacity: 0.6; transform: translateY(-22px); } }
 @keyframes pbLive {
   0%, 100% { box-shadow: 0 0 0 0 rgba(53, 217, 139, 0.5); }
   70% { box-shadow: 0 0 0 6px rgba(53, 217, 139, 0); }
@@ -132,6 +159,8 @@ a:hover { color: var(--accent-hover); }
   [data-motion="auto"] *,
   [data-motion="auto"] *::before,
   [data-motion="auto"] *::after { animation: none !important; }
+  /* Transitions too: .reveal would otherwise still slide in on mount. */
+  [data-motion="auto"] .reveal { transition: none !important; }
   [data-motion="auto"] [data-hero-art] { opacity: 1 !important; }
   [data-motion="auto"] [data-intro],
   [data-motion="auto"] [data-title-exit],

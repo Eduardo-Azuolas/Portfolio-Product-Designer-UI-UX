@@ -28,7 +28,7 @@ Destino: `portfolio/` — projeto npm real, dev server e build de producao.
 - [x] 12. Pagina Contact (form -> mailto)
 - [x] 13. Copiar assets/Resume-*.pdf para public/assets/
 - [x] 14. Verificar: tsc --noEmit, vite build, dev server sobe
-- [ ] 15. Revisao visual no browser lado a lado com o original (extensao Chrome indisponivel nesta sessao)
+- [x] 15. Revisao visual no browser (2026-09-22): desktop EN/PT no Forge com as imagens novas, mobile 375px em Aether e Reloop, home com as placas, visor de zoom e retorno de foco. Detalhe conhecido: documento de 1936px no mobile fica em 327px e so e legivel pelo visor.
 
 ## Como validar
 ```
@@ -1042,17 +1042,14 @@ CORRECAO DA AUDITORIA: eu disse "31 valores ad-hoc, sem ritmo 4/8". Errado.
       Fundo e deliberado — marca solta some em aba clara. Cores literais:
       favicon nao herda nada da pagina.
 - [x] Pagina de conferencia removida apos aprovacao.
-- [ ] `apple-touch-icon`: iOS exige PNG 180x180. Sem rasterizador nesta maquina.
-      Exportar o SVG e ligar quando houver.
+- [x] `apple-touch-icon`: PNG 180x180 ja existe em public/assets/og/ e esta ligado no index.html.
 
 ## Aberto da auditoria (baixa severidade)
-- [ ] `alt` do Figure duplica o `figcaption` — leitor de tela le duas vezes
-- [ ] Medida de linha 85-88 chars em `.case-section__body`, `.resume__summary`,
-      `.philosophy__sub` (recomendado 65-75)
-- [ ] `role="list"` nas 5 listas com `list-style: none` (Safari/VoiceOver perde
-      a semantica de lista)
-- [ ] `srcset` no retrato (560px servidos para slot de 320px)
-- [ ] `overflow-x: clip` no `.shell` mascara overflow em vez de evita-lo
+- [x] `alt` do Figure: resolvido antes desta rodada — Figure usa alt="" decorativo e so as tabelas do InvestIQ carregam alt de conteudo. Verificado: 0 imagens sem atributo alt em 10 paginas.
+- [x] Medida de linha: as tres classes passaram de max-width em px para 70ch.
+- [x] `role="list"` nas 5 listas (case-index, sheet, res-row bullets, res-certs, skill-cell). Verificado no DOM.
+- [x] `srcset` no retrato: gerado portrait-320.webp (5,7KB); 1x agora baixa 320 em vez de 560 (17KB).
+- [x] `overflow-x: clip`: medido com o clip desligado em 7 paginas a 360px — scrollWidth == clientWidth em todas. Nao mascara nada; os unicos elementos fora da viewport sao os dois .backdrop, que sao position:fixed. Fica como rede de seguranca.
 
 ---
 
@@ -1223,3 +1220,311 @@ Referencia de como deveria ser: `casado/ds-colors` esta perfeito.
 ("Button label", "Nav label", "Tab label", "Placeholder text") — sem paleta,
 sem escala tipografica, sem titulos de secao. Muito mais raso que o ds dos
 outros cases. `casado/ds-colors` e `forge/ds` sao o padrao a seguir.
+
+## InvestIQ v2 — revisao do case para portfolio review (2026-09-21)
+
+Contexto: entrevista pleno, empresa internacional nao-fintech, portfolio review aberto, 1-3 dias.
+Projeto 100% conceitual, sem pesquisa nem testes -> enquadrar como hipoteses + plano de validacao.
+Paginas EN `28:2`-`28:10` clonadas como `v2 · ...` no mesmo arquivo; originais intactas.
+
+- [x] 1. Framing: Cover v2 (sem "reconstrucao") + pagina Overview
+- [x] 4. Pagina Key Decisions (3 decisoes, alternativas, trade-offs) + wireframes anotados
+- [x] 7. Outcomes -> Success Metrics & Validation Plan (sem numeros inventados)
+- [x] 3. Logica de onboarding 4 passos coerente (journey, flow, tabela, hi-fi 1-2-3-4)
+- [x] 5. Hi-fi: data viz real, placeholders, dominio, consistencia, estados empty/loading/error
+- [x] 6. Design system reconciliado com UI + estados + tokens + contraste AA
+- [x] 2. Problem & Assumptions + proto-personas
+- [x] 8. Polish: nomes de layers, grid, alturas de wireframe
+- [x] 9. `tasks/investiq-interview-notes.md` (talk track + perguntas provaveis)
+- [x] Changelog v2 no Figma
+
+Resultado: 12 paginas `v2 ·` no topo do arquivo, divisor, v1 (PT + EN) abaixo sem alteracao de conteudo.
+Efeito colateral aceito: `color/text/muted` repontado para `stone/300` (#939b93, AA). Componentes PT v1
+ligados a essa variable ficaram com cinza mais claro (so cor). Reverter: apontar de volta para `stone/400`.
+Novas variables: `stone/300`, `violet/400`, `color/chart/1-4`, `color/status/warning-text`.
+Pendente (fora do escopo): reexportar imagens do site (`portfolio/public/assets/cases/investiq/`) a partir do v2.
+
+## Portfolio — auditoria UX/UI + acessibilidade e correcoes (2026-09-21)
+
+Relatorio: `tasks/portfolio-audit.md`. Sem commit.
+Decisoes: Pulse = freelance real, cliente nao citado, metricas medidas, papel "Product designer (freelance)",
+time = Eduardo + engenharia do cliente. Forge = conceito solo. Aether = sem teste (+38% so projetado).
+InvestIQ = alinhado ao Figma v2 (conceito, sem 4.7/5).
+
+- [x] 1. Conteudo dos cases (cases.ts, media.ts)
+- [x] 2. Navegacao: links reais, title por rota, foco no h1, Back restaura grid, WORK current, 404 de case, idioma persistente
+- [x] 3. Acessibilidade: skip link, scroll-padding, figuras (alt + ampliar), contraste de bordas, motion, toggle idioma, contato, resume, aria-hidden FIG/*
+- [x] 4. UI: cols mobile, labels de acao, microcopy >=12px, strings PT, CTA fim do case + footer, fonte 700
+- [x] 5. SEO: meta/OG/canonical, robots, sitemap, og:image
+- [x] 6. Relatorio `tasks/portfolio-audit.md`
+- [x] 7. Verificacao: typecheck + build OK; browser coberto na rodada de acessibilidade (375px, zoom 200%, Back, foco)
+
+Extra: 22 imagens InvestIQ reexportadas do Figma v2 para `public/assets/cases/investiq/v2/` (v1 ui/ds/etc removidas; wireframes mantidos).
+
+## Figma — auditoria InvestIQ/Pulse/Forge + correcoes Fase A (2026-09-21)
+
+Entrevista qua 23/09 (EN, pleno, walkthrough InvestIQ). Relatorio: `tasks/figma-audit.md`.
+Fase A (antes de quarta, EN): InvestIQ completo; Pulse e Forge so criticos. Fase B depois.
+
+- [x] A1. Relatorio `tasks/figma-audit.md` + padrao comum
+- [x] A2.1 InvestIQ: swap instancias v1 -> v2; novos componentes (allocation row, next-step, suggestion, chip, account row)
+- [x] A2.2 InvestIQ: bind fills/strokes a variables
+- [x] A2.3 InvestIQ: text styles Inter + aplicar
+- [x] A2.4 InvestIQ: a11y (alvos >=44, 11->12px, red/500, pressed, frame a11y notes)
+- [x] A2.5 InvestIQ: core task (suggestion detail, confirm, success, portfolio) + disclosure
+- [x] A2.6 InvestIQ: prototipo clicavel + link
+- [x] A2.7 InvestIQ: secoes, ordem, nomes
+- [x] A2.8 InvestIQ: metricas (act on next step, metodo) + JTBD/persona secundaria
+- [x] A2.9 Site: reexportar imagens InvestIQ alteradas
+- [x] A3. Pulse criticos (texto financeiro, metricas, contraste, placeholders, graficos)
+- [x] A4. Forge criticos (claims conceituais, numeros, a11y claims, tokens)
+
+## Figma Fase B — arquivos impecaveis (2026-09-22)
+
+Ordem InvestIQ -> Forge -> Pulse. PT depois do EN de cada arquivo. Plano: ~/.claude/plans/cryptic-dazzling-newt.md
+
+- [x] 1.1 InvestIQ: componente Allocation row + substituir
+- [x] 1.2 InvestIQ: renomear space/* radius/*
+- [x] 1.3 InvestIQ: pagina Components
+- [x] 1.4 InvestIQ: desktop detail + review
+- [x] 1.5 InvestIQ: competitive UX row
+- [x] 1.6 InvestIQ: varredura final (fills, styles, layers) em todas paginas v2
+- [x] 1.7 InvestIQ: paginas PT
+- [x] 1.8 InvestIQ: archive v1 — copia mp7vTrq46fhbMcG0djAdWx so com v1 (EN, divisor, PT, aviso na capa com link); principal sem v1, paginas sem prefixo v2, 7 text styles v1/* removidos, Changelog EN/PT com link
+- [x] 1.9 InvestIQ: reexport site — 25 imagens em EN + PT (en/v2, pt/v2), alturas iguais por par; media.ts com investiqBoth; miniaturas PT das Decisoes 02/03 refeitas a partir dos wireframes PT; R$ 000.000,00 no wireframe PT; build OK
+- [x] 2.x Forge: tokens em camadas + dark, styles, componentes, telas, matriz, paginas, PT, site
+- [x] 3.1 Pulse: tokens em camadas (Primitives + Semantic "Dark", space/radius) + 15 text styles, sweep nas paginas EN
+- [x] 3.2 Pulse: pagina Components (17 sets em sections)
+- [x] 3.3 Pulse: Hi-Fi EN refeito com instancias (onboarding 4 passos com papel, Home x3 papeis, dashboards, report builder, 5 estados, mobile + justificativa, a11y notes)
+- [x] 3.4 Pulse: prototipo EN (33 links, 2 starting points)
+- [x] 3.5 Pulse: DS doc novo (primitivos, semanticos, contraste, tipo, espacamento, componentes)
+- [x] 3.6 Pulse: Personas, Overview, Metrics & validation, Changelog, resultados dos testes, copy finance
+- [x] 3.7 Pulse: paginas PT (clones traduzidos, numeros BR, prototipo PT)
+- [x] 3.8 Pulse: site (ui-01..07, uxflow, insights, validation, ds; media.ts; copy) — build OK
+- [x] 3.9 Eduardo revisou os textos plausiveis do Pulse (ok, 2026-09-22)
+
+## Figma Fase C — Casado, Reloop, Aether (2026-09-22)
+
+Plano: ~/.claude/plans/cryptic-dazzling-newt.md. Auditoria: tasks/figma-audit.md > Fase C. Ordem Casado -> Reloop -> Aether. Denise real (conversa); Marina arquetipo; Aether so desk research.
+
+- [x] 1.1 Casado: tokens AA (honey/coral/status), focus/border-strong/disabled, alias + scopes
+- [x] 1.2 Casado: 15 text styles (Fraunces + Work Sans), Caption 12, aplicar em tudo
+- [x] 1.3 Casado: pagina Components com estados + novos (Time slot, Product card, Order row, Top bar, State panel, Icon set)
+- [x] 1.4 Casado: Hi-Fi refeito com instancias (24h/pt-BR no PT, calendario com legenda, estados)
+- [x] 1.5 Casado: pesquisa (metodo Denise; Marina proto-persona), metricas mensuraveis
+- [x] 1.6 Casado: paginas padrao (Overview, Key Decisions, Metrics, Changelog), prototipo
+- [x] 1.7 Casado: PT + site (26 imagens EN/PT, media.ts, copy DS/pesquisa) — build OK
+- [x] 2.1 Reloop: tokens AA (primitivos por matiz real, muted/brand/status/botao), focus/border-input/disabled, alias + scopes
+- [x] 2.2 Reloop: 15 text styles (Fraunces + Work Sans), minimo 12px, aplicados em 100% dos textos
+- [x] 2.3 Reloop: pagina Components (15 sets com estados, icones reais, Condition badge com medidor de 4 pontos)
+- [x] 2.4 Reloop: Hi-Fi refeito com instancias, R$ + checkout BR (CEP/Pix), disputa, web mobile, estados
+- [x] 2.5 Reloop: honestidade (proto-personas sem citacao, Assumptions, desk research, metas com definicao)
+- [x] 2.6 Reloop: paginas padrao (Overview, Key Decisions, Metrics & Validation, Changelog), prototipos EN/PT
+- [x] 2.7 Reloop: PT (14 paginas, 883 textos/props), nomes de frames, links do Overview, thumb da capa
+- [x] 2.8 Reloop: site — 27 imagens EN/PT, media.ts (slots ds/outcome novos), cases.ts sem -32%/+18%/2,5x — build OK
+- [x] 2.9 Casado: metricas do site alinhadas as metas do Figma (<1 em 20, metade dos DMs, guardrail semanal)
+- [x] 3.1 Aether: honestidade (desk research, sem entrevistas/testes, sem -52%, metas com definicao)
+- [x] 3.2 Aether: tokens em 2 camadas (primitivos + semanticos), AA no escuro (erro 1,3:1 -> 5,4:1; muted 3,6 -> 5,3), space/radius
+- [x] 3.3 Aether: 15 text styles (Space Grotesk + Inter), minimo 12px, 100% aplicados
+- [x] 3.4 Aether: pagina Components (10 sets + Icon vetorial no lugar da fonte de icones)
+- [x] 3.5 Aether: Hi-Fi refeito com instancias — modo treino, envio real, frase adiada, 3 erros + vazio/carregando
+- [x] 3.6 Aether: paginas padrao (Overview, Key Decisions, Metrics & Validation, Changelog), prototipo EN/PT
+- [x] 3.7 Aether: PT espelhado (13 paginas, dicionario de 362 entradas)
+- [x] 3.8 Aether: site — 22 imagens EN/PT, media.ts, cases.ts (metas no lugar de +61/+38/-52) — build OK
+
+## Fase D — verificacao cruzada do site (2026-09-22)
+
+- [x] D1 Script de verificacao: 172 referencias de midia x arquivos x dimensoes (0 faltando, 0 orfas apos limpeza)
+- [x] D2 Corrigir caixas EN/PT divergentes: forge/research, forge/ds, investiq/wire-05 (+ media.ts atualizado)
+- [x] D3 Remover imagens orfas (aether overview EN/PT)
+- [x] D4 Checar contraste dos tokens de InvestIQ, Pulse e Forge; corrigir border/default do InvestIQ (2,93 -> 3,28)
+- [x] D5 Varredura de cópia: pares EN/PT identicos, claims de AA, projecoes vs metas
+- [x] D6 Slots de midia x secoes, assets de OG, typecheck + build
+
+## Acessibilidade — rodada no browser (2026-09-22)
+
+Medido no build servido por `vite preview`, com iframes de 375px e 600px (zoom 200%).
+
+- [x] A1 Auditoria automatica em 10 paginas: 0 imagem sem alt, 0 controle sem nome acessivel, 0 pulo de heading, 1 h1 por pagina, <main> presente, 0 id duplicado, 0 alvo abaixo de 24x24.
+- [x] A2 Contraste computado com composicao de alpha (11 paginas, EN e PT): 0 reprovacao. As duas falhas do primeiro passe eram erro do meu script, que ignorava o alpha do fundo.
+- [x] A3 Transbordo horizontal: 0 em 7 paginas com o clip do shell desligado.
+- [x] A4 Zoom 200% (viewport de 600px): 0 transbordo em 11 paginas.
+- [x] A5 `lang`: passou a ser `pt-BR` no modo portugues (era `pt`), e `en` no ingles. aria-pressed correto nos dois botoes.
+- [x] A6 `aria-current="false"` saiu do indice do case (15 ocorrencias por pagina); agora o atributo so e emitido quando ativo. Header mantem page/location.
+- [x] A7 Skip link, foco no h1 apos troca de rota (preventScroll), 0 tabindex positivo, bloco de prefers-reduced-motion cobrindo animacoes, transicoes, hero e plates.
+- [x] A8 Back reteste com a aba visivel: restaura 1793px exatos, forward volta ao topo do case, back de novo restaura. O problema anterior era rAF congelado em aba oculta.
+
+## Fase E — Pulse e Forge no padrao da Fase C (2026-09-22)
+
+Levantamento: Pulse ja esta no padrao (13 paginas EN + espelho PT, 100% dos textos com style, 0 abaixo de 12px, 17 componentes, Hi-Fi com 149 instancias, Metrics & Validation com definicao/metodo/janela). Forge tem as lacunas.
+
+- [x] E1 Forge: Key Decisions reunindo Strategize + Explore + Iterate; apagar as tres paginas (EN e PT)
+- [x] E2 Forge: quadro Metrics & Validation (metrica, definicao, meta, metodo, janela, rotulo) na pagina de resultados, como no Pulse
+- [x] E3 Forge: aplicar text style nos 7 textos sem estilo da pagina Wireframes
+- [x] E4 Forge: limpar fills crus (18 em Components, 4 no Hi-Fi) e nomes genericos
+- [x] E5 Forge: espelho PT das paginas novas/alteradas
+- [x] E6 Forge: site — metricas viram metas com definicao (basis target), copy de outcome/validation alinhada, reexportar imagens afetadas, build
+- [x] E7 Pulse: renomear camadas genericas (Journey 16, Metrics 36, Components 8, Flows 3)
+
+- [x] A9 Visor de zoom devolvia o foco ao body ao fechar; agora volta ao botao que o abriu (CaseStudy.tsx). Verificado no browser.
+
+## InvestIQ — hi-fi v3 + mockups (2026-09-28)
+
+Figma (aiZAr4JHmFuPzm25zIIC7m): páginas novas `Mockup Kit`, `Hi-Fi v3` e `Hi-Fi v3 · PT`. A v2 ficou intacta.
+- v3: status bar + home indicator (componentes no Mockup Kit), telas com no mínimo 390x844, tab bar fixa e
+  translúcida, CTA preso no rodapé nos passos, voltar nos passos 1–4, hero da landing = prévia do produto,
+  welcome = consolidação das 3 contas (somam os R$ 128.450 da tabela), sparkline + iniciais das contas na Home,
+  gráfico do D1 refeito para ocupar o card, segmento tracejado "depois da ordem" (46%) no D2, D2/D3 em 900pt.
+- Inter continua sendo a única fonte (decisão do Changelog v2); a hierarquia dos valores vem do "R$" menor e
+  dos centavos apagados.
+- Export: clone escalado 2x no Figma -> screenshot -> WebP q84. `public/assets/cases/investiq/{en,pt}/v3/`,
+  36 arquivos, ~1,7 MB no total. EN e PT com as mesmas alturas.
+
+Site:
+- `components/Device.tsx`: iPhone e navegador em CSS (container units), `ScreenImg`, `travel()`.
+- `components/MockupScene.tsx`: devices em perspectiva sobre o chão do blueprint; entra com animação no hero
+  (`eager`) e com scroll-driven animation nos demais; segue o ponteiro via --pbx/--pby.
+- `components/ScreenSequence.tsx`: celular fixo + passos rolando (IntersectionObserver no meio da tela);
+  abaixo de 900px vira um trilho horizontal com scroll-snap.
+- `components/Spotlight.tsx`: uma tela com pinos numerados e notas com linha de chamada; empilha no mobile.
+- `Figure.tsx`: `device` e `span` no SlotImage montam a figura dentro do device (zoom continua abrindo o frame todo).
+- `CaseMedia` ganhou `hero`, `stages` e `slotLabels`. InvestIQ: hero (D1 + landing + home), seção UI com
+  sequência do onboarding, spotlight da Home e galeria "todas as telas" em devices. Miniatura da home usa v3.
+- Movimento reduzido: tudo cai na pose final, sem transição de troca de tela.
+- Pendência: os `ui-*`/`state-*` da pasta v2 ficaram órfãos (nada mais aponta para eles).
+
+### Polimento (2026-09-28, pedido do Eduardo)
+- Fundos: os exports v2 voltaram com o canvas assado (#12131A) e o cinza do Figma (#F6F6F6) nos vãos e
+  no preenchimento que iguala EN/PT. Knockout só das regiões ligadas à borda (wireframe claro dentro da
+  folha fica), anti-aliasing desfeito por color-to-alpha, legenda sobre a faixa clara repintada como tinta
+  clara. 8 figuras x 2 idiomas: problem-compare, journey, personas, competitive, decision-02, flow, ds, metrics.
+- CTA cortado: passo 4, detalhe da sugestão e revisão ganharam barra de ação fixa no Figma (EN e PT) e
+  agora saem em 390x844. A versão longa virou `*-full.webp` e só o modal usa (`SlotImage.full`).
+- Modal: telas abrem dentro do device num tamanho de leitura (celular até 380px, navegador até 1200px);
+  tela mais alta que o device rola por dentro, com a status bar fixa. Documentos continuam no zoom antigo.
+
+### Wireframes (2026-09-28)
+- Conteúdo da primeira rodada mantido (pedido: só polir). Figma: páginas novas `Wireframes · dark` e
+  `Wireframes · dark · PT`, clones recoloridos (cinza claro -> cinza escuro por luminância); originais intactos.
+- Export 390x844 @2x -> `public/assets/cases/investiq/{en,pt}/wire-v2/`. Os `wire-0X.webp` antigos ficaram órfãos.
+- Site: `components/WireGrid.tsx` (stage `wires`): 8 tiles no mesmo tamanho, moldura simples de celular
+  (`device--wire`), tile fantasma para o passo 3 que não existia, pinos 1–4 e legenda "o que a rodada seguinte
+  mudou" (social proof cortado; decisões 01, 02 e 03). Clique abre o modal na moldura de wireframe.
+- Texto da seção Exploração ajustado: dizia "cada tela" e "quatro passos", mas a rodada tinha três.
+
+## Aether — hi-fi v3 + mockups + wireframes (2026-09-28)
+
+Figma (iOvHgJ3n2dIPnn8PAswVBc): páginas novas `Mockup Kit`, `Hi-Fi v3`, `Hi-Fi v3 · PT` e `Wireframes · dark`. Hi-Fi e Hi-Fi · PT originais intactos.
+- Correções no Components (valem para o arquivo todo): Button tinha o frame interno em hug (24px) dentro de um componente de 44 — o fundo encolhia até a altura do texto. Agora preenche; primary/ghost 52pt, link 44pt. Campo do Input ganhou 13px de padding vertical. Ícones: o frame interno não escalava (constraints MIN), então em 16/18px o glifo saía deslocado para baixo/direita; agora SCALE.
+- v3: status bar + home indicator (componentes no Mockup Kit), 390x844 fixos. Boas-vindas ganhou prévia do ensaio (card de treino na frente, envio real atrás, stepper de 4 passos) no lugar do espaço vazio. Passos de processamento viraram um card; processamento de treino/real ganhou valor + taxa. Treino concluído lista os quatro passos vistos. PT: botões de painel que quebravam linha alargados (S3, S5 desanexados só no v3 · PT).
+- Export 2x -> `public/assets/cases/aether/{en,pt}/v3/` (13 telas por idioma, mesmas alturas). Os `ui-*.webp` antigos na raiz de en/pt ficaram órfãos.
+- Wireframes: clones recoloridos por luminância, 320x700 -> 390x844, `public/assets/cases/aether/wire-v2/` (sem texto, um arquivo para os dois idiomas). `wire-0X.webp` antigos órfãos.
+- Documentos: o chão #1E1E2E foi removido (só a região ligada à borda) em research, competitive, journey, decisions, flows, metrics, outcomes; a linha clara de 1px no rodapé saiu. ds.webp mantém o chão (é um dos tokens).
+
+Site (`media.ts` / `cases.ts`):
+- Hero: treino · boas-vindas · envio real, glow lavanda. Miniatura: 01, 03, 06.
+- Exploração: WireGrid com 5 wireframes + 3 fantasmas (treino concluído, frase de recuperação, estados de erro), pinos 1–5 ligados às decisões 02/03 e ao Changelog.
+- UI: sequência "o ensaio" (01–05), spotlight do envio real (06) com 4 notas, galeria 07–10 + S1–S3.
+- Copy: DS diz 52/44pt em vez de "44pt"; UI menciona a prévia do ensaio e a lista na conclusão; Exploração explica os pinos.
+
+### Aether — ajustes (2026-09-28, pedido do Eduardo)
+- Mockups do Aether diferentes dos do InvestIQ: hero em leque (celulares retos girando a partir de um pivô, anéis de órbita no chão, `Scene.layout: 'fan'`), ensaio numa tira com os 5 passos lado a lado e trilho numerado que se preenche com o scroll (`components/FlowStrip.tsx`, stage `strip`), treino x real lado a lado com as diferenças no meio e pinos nos dois celulares (`components/ComparePair.tsx`, stage `pair`), galeria com colunas pares deslocadas (`CaseMedia.stagger`).
+- "The Problem & The Research": o parágrafo de Curiosity vs. Fear passava por baixo dos cards no Figma (EN e PT). Cards e o resto da página descidos 72px; reexportado (1936x2400) e fundo removido de novo.
+- Wireframes: quadros fantasma removidos do Aether e do InvestIQ. Pinos renumerados; as notas das telas que não existiam viraram notas sem pino, marcadas com "+" (WireGrid aceita nota sem `n` e `cols`). Aether em 5 colunas.
+
+## Pulse Analytics — hi-fi v3 + mockups + wireframes (2026-09-28)
+
+Figma (ENI5lQV7km9zFiYvLi2lUI): páginas novas `Hi-Fi v3`, `Hi-Fi v3 · PT`, `Mockup Kit`, `Wireframes · dark`. Hi-Fi originais intactos.
+- Components: Insight Card com valor em cima e comparação embaixo (antes a comparação quebrava linha ao lado do valor), contexto ocupa o espaço livre para os botões alinharem entre os cards.
+- v3: telas desktop com altura mínima de 900 (1440x900, sem sobra no navegador), cards de insight com a mesma altura na linha, iniciais do avatar batendo com o nome (Rafael Costa, Helena Prado e Lucas Costa apareciam como MA), gráfico de barras da região preenchendo o card, rótulo "Jul" no eixo do gráfico de linha e valor final fora da linha, status bar + home indicator no mobile e uma versão 390x844 do mobile. PT: "Estável vs jul" cortado no ticket médio virou "Estável".
+- Export 1936px (desktop) / 780px (mobile) -> `public/assets/cases/pulse/{en,pt}/v3/`, 18 arquivos por idioma, mesmas alturas.
+- Documentos: problem, research-methods e strategy reexportados do Figma com uma margem em volta dos cards; ds reexportado só com a biblioteca de componentes (o export antigo tinha fundo #F6F6F6 e faixa escura); chão #080C14 removido de todos.
+- Wireframes: 7 desktop recoloridos -> `pulse/wire-v2/` (1240x800). `wire-0X.webp` antigos órfãos, assim como `en|pt/ui-0X.webp`.
+
+Site — linguagem própria, diferente de InvestIQ (perspectiva) e Aether (leque):
+- Hero `layout: 'stack'`: três navegadores retos em cascata (Home de cada papel) com etiqueta em cima e o celular ao lado.
+- `components/ViewSwitcher.tsx` (stage `tabs`): um navegador com abas; a barra da aba ativa é o timer do autoplay (pausa em hover/foco, para quando alguém clica, some com movimento reduzido). Usado em UX Flow (onboarding numerado 01–05) e UI (uma Home, três papéis).
+- `components/LensView.tsx` (stage `lens`): dashboard da região com 3 recortes ampliados ao lado (variação com meta, Insight Card no dashboard, leitura em uma linha).
+- Galeria em 2 colunas de navegadores (09 largura total + 11–16). Wireframes em grade de 4 com pinos 1–5 e duas notas "+" (estados, mobile).
+- `Device` ganhou `fit` (mostra a tela inteira na proporção dela).
+
+## Forge — hi-fi v3 + mockups + wireframes (2026-09-28)
+
+Figma (Yg7hmLnYLxU3gRctk38M0J): páginas novas `Hi-Fi v3`, `Hi-Fi v3 · PT` e `Wireframes · dark` (logo depois de Wireframes). Hi-Fi originais intactos.
+- v3: colunas do kanban com a mesma largura e iniciais variadas nos avatares; cards do detalhe da task abraçam o conteúdo; fundo do modal na vitrine de composição não invade mais a tabela; dashboard de saúde com KPIs em terços, 8 times (Payments 92%, Search 73%) e "3 de 8", barras mais largas, desvios descidos. PT: botão "Nova tarefa" realinhado à direita (claro e escuro).
+- Documentos no Figma: caixas de número do Problem não se sobrepõem mais (EN/PT, mesma altura) e o resto da página desceu; Foundations com a escala azul certa (o 50 era azul-marinho), colunas alinhadas, título do card 03 sem sobrepor o texto e Primary #1D4ED8; Component Architecture com cards compostos alinhados; Design System com tudo numa coluna de 1240, galeria de componentes sem estourar a borda (inputs em 2x2), ícones distribuídos e textos PT traduzidos na galeria; tabela de métricas virou card branco; título PT do rollout sem quebrar em cima do texto.
+- Export 1936px -> `forge/{en,pt}/v3/ui-01..05`. Documentos reexportados só com os cards (research, strategy, decisions, uxflow, ds, outcome, metrics) e o chão #F3F4F6 removido; rótulos que ficavam no chão repintados claros. Caixas do problema reexportadas inteiras (antes estavam cortadas).
+- Wireframes: 5 recoloridos -> `forge/wire-v2/` (690x1170). `forge/wire-0X.webp` e `forge/{en,pt}/ui-0X.webp` antigos ficaram órfãos.
+
+Site — linguagem própria, diferente de InvestIQ (perspectiva), Aether (leque) e Pulse (pilha):
+- `components/ThemeSlider.tsx` (`CaseMedia.heroCompare`): hero com o mesmo board claro/escuro dividido por um controle arrastável (input range nativo, teclado e leitor de tela); varre uma vez ao aparecer, sem varrer com movimento reduzido.
+- `components/Anatomy.tsx` (stage `anatomy`): detalhe da task com os componentes contornados (atômicos em ciano, composto em âmbar) e legenda numerada; passar o mouse/focar isola a peça, clique fixa. Tela fica fixa (sticky) enquanto a legenda rola.
+- Wireframes em navegador, 5 colunas, pinos 1–5 e uma nota "+" (board escuro e dashboard de saúde).
+- UI: galeria em 2 colunas (vitrine de composição e dashboard de saúde). Miniatura da home: dashboard de saúde v3.
+- Copy: Exploração explica os pinos; UI menciona o controle claro/escuro e a anatomia; DS diz primary #1D4ED8 (o #3B82F6 reprova no AA para texto branco).
+
+## Casado Doces — hi-fi v3 + mockups + wireframes (2026-09-29)
+
+Figma (kDtapCsvRm0v6HsIiyNJoo): `Hi-Fi v3` / `Hi-Fi v3 · PT` e `Wireframes · dark` / `· PT` (sessão anterior). Nova página `Docs v3 · export` com `Component Library — EN/PT`, montadas de instâncias do Components (estados de dia já no padrão novo: só lotado riscado, fechado/passado esmaecido, Hoje só contorno).
+- Wireframes escuros: fundo de todas as telas unificado em #141516 (as do cliente tinham faixas mais escuras atrás de calendário, carrinho e horários); cabeçalho da semana alinhado às colunas dos dias (gap 6); PT com D S T Q Q S S.
+- Documentos corrigidos no Figma (EN e PT): parágrafo de método virou o card "Method/Método" no bloco de definição; cards da concorrência, da jornada (oportunidades alinhadas embaixo, mesma altura), do fluxo, do mapa do app e da reflexão com alturas iguais; setas do fluxo centralizadas; bolinha do cabeçalho do mapa alinhada; notas de acessibilidade estavam cortadas (cards com 42pt fixos) — agora abraçam o texto, e "Nunca só a cor" descreve os estados novos; persona PT "Para o que está fazendo…" → "Interrompe o que está fazendo…".
+- Export 1936/1440: personas, definition, competitors, journey, flow, sitemap, metrics, reflection só com os cards, fundo creme fora (transparente). Setas do fluxo repintadas claras. Folhas de DS (primitives, semantic, contrast, type) exportadas sem fundo e montadas num painel creme arredondado; ds-components e ds-a11y já são painéis creme. EN e PT com o mesmo tamanho (sobra transparente embaixo).
+- Wireframes: `casado/{en,pt}/wire-v2/cwire-01..07`, `dwire-01..05` (750x1624).
+
+Site — linguagem própria (InvestIQ perspectiva, Aether leque, Pulse pilha, Forge slider):
+- `components/PickupSync.tsx` (`CaseMedia.heroSync`): hero com o mesmo pedido nos dois celulares — confirmação da Ana (cui-06) e fila da Denise (dui-03) — e, no meio, o evento da agenda (Sáb 12 set, 15:00, pedido #1042) com uma linha tracejada saindo dos furos do ticket até a linha do pedido em cada tela. Fundo em grade de mês (7 colunas × 5 semanas). Abaixo de 900px os celulares ficam lado a lado e o evento embaixo.
+- `components/Lanes.tsx` (stage `lanes`): UI em raias — app da cliente em cima, painel da Denise embaixo, cada tela na coluna do passo; 5 ligações numeradas onde um lado decide o outro (catálogo, pagamento/agenda, capacidade, pedido, status) com a lista explicando. Rola de lado no mobile (`contain: inline-size` para não alargar a página).
+- Wireframes: 12 telas em 6 colunas, pinos 1–6 + nota "+" (estados de exceção). Sem fantasmas.
+- Galeria UI: estados S1–S5 em celulares. Miniatura da home: cui-01, cui-05, cui-06 v3.
+- Copy: Exploração explica os pinos; UI menciona as raias e o hero; DS diz que só lotado é riscado.
+- Verificado: typecheck ok, build ok, casado EN 1440 e PT 390 sem imagem quebrada nem rolagem horizontal; home, forge, investiq, aether, pulse sem imagem quebrada.
+- Órfãos (não apagados): `casado/{en,pt}/cui-01..07`, `dui-01..05`, `cwire-01..07`, `dwire-01..05` na raiz de en/pt. Pasta `_tmp/` na raiz do projeto (rascunho da verificação: dist.tgz, v3sheet.png) — pode apagar.
+
+## Reloop — hi-fi v3 + mockups + wireframes (2026-09-29)
+
+Figma (4cvW112sMf86LOrjFHgb6G): páginas novas `Hi-Fi v3`, `Hi-Fi v3 · PT` (clones das seções de compra, disputa, mobile, estados e venda), `Wireframes · dark`, `Wireframes · dark · PT` e `Docs v3 · export` (Component Library EN/PT montada de instâncias). Hi-Fi originais intactos.
+- v3: telas desktop com altura mínima de 900 (sidebar da venda preenche a altura); status bar 9:41 + home indicator nas 3 telas mobile; datas da disputa coerentes (a resposta vencia "dom 20 set" e a linha do tempo dizia 21 — agora seg 21 set nos dois lugares e no repasse); vendedor da jaqueta era @marina.brecho, agora @rafa.brecho (a persona vendedora é o Rafael) e o PT passou "a vendedora" para "o vendedor"; painel do vendedor ganhou o KPI Disputas = 1 ("Responder até seg, 21 set") e a jaqueta em disputa em "Precisa da sua atenção"; foto da jaqueta recortada (tinha um reflexo de janela no canto) em todas as telas.
+- Export: `reloop/{en,pt}/v3/ui-01..14`, `m-1..3` (780x1688), `st-1..4`. As telas maiores foram exportadas em fatias e remontadas (o screenshot inline corta imagens grandes).
+- Wireframes: clones recoloridos (cinzas neutros → escuro), cortados em 1440x1024, sidebar da venda até o fim → `reloop/{en,pt}/wire-v2/bwire-01..07`, `swire-01..05` (1240x882).
+- Documentos no Figma (EN e PT): personas com a mesma altura; parágrafo de método virou card "Method/Método"; cards da análise competitiva com a mesma altura e o posicionamento na largura toda; jornada com as oportunidades alinhadas embaixo; mapa do site com a mesma altura; decisões e métricas exportadas só com os cards; notas de acessibilidade com linhas de mesma altura; PT da escala tipográfica encurtado (o Display/Hero estourava a borda).
+- Export 1936/1440, fundo creme fora: personas (novo, no lugar de `problem`), research-definition, research-scan, insights, strategy, uxflow (rótulos do canvas repintados claros), metrics. ds-primitives/semantic/contrast/type viraram painéis creme arredondados; ds-components (novo) e ds-a11y já são painéis.
+
+Site — linguagem própria (InvestIQ perspectiva, Aether leque, Pulse pilha, Forge slider, Casado evento sincronizado):
+- `components/HangTag.tsx` (`CaseMedia.heroTag`): hero com a página do produto num navegador e o nível pendurado como etiqueta de brechó, presa no canto do navegador por um barbante; a etiqueta traz a escala inteira com "Good/Bom estado" marcado e a nota do vendedor. Balança de leve; parada com movimento reduzido. No mobile a etiqueta fica embaixo do navegador.
+- `components/BadgeTrail.tsx` (stage `trail`): o mesmo selo seguido por seis telas reais (busca, produto, carrinho, pedido, disputa, anúncio do vendedor), cada uma recortada no ponto do selo e com o selo circulado, num trilho numerado com a troca "Quem compra → Quem vende". `markPt` ajusta o anel no PT. Rola de lado no mobile.
+- Wireframes: 12 em navegador, 4 colunas, pinos 1–7 e uma nota "+" (disputa, mobile e estados que a rodada não tinha).
+- Galeria UI em 6 colunas: 8 navegadores (span 3), 3 celulares (span 2), 4 estados. No mobile os celulares ficam 2 por linha (CaseStudy: span não força largura total em celular).
+- Copy: Exploração explica os pinos; UI menciona a trilha e a etiqueta; PT "prazo da vendedora" → "do vendedor".
+- Verificado: typecheck ok, build ok; reloop EN 1440 e PT 390 sem imagem quebrada nem rolagem horizontal; home, casado, forge, investiq, aether, pulse sem imagem quebrada.
+- Órfãos (não apagados): `reloop/{en,pt}/ui-01..09`, `wire-01..06`, `problem.webp`.
+
+## Limpeza de assets não usados (2026-09-29)
+- Removidos 188 webp órfãos de `public/assets/cases/` (ui-/wire-/cui-/dui-/cwire-/dwire- antigos na raiz, `investiq/*/v2/ui-*` e states, `investiq/*/v3/ui-welcome`, `reloop/*/problem`) e a pasta `_tmp/`.
+- Mantidos: `*-full.webp` (zoom sob demanda), `dist/`, `uploads/`, `assets/`, `Portfolio.dc.html`, `support.js`.
+- Build e typecheck ok após a limpeza.
+
+## Thumbnails dos cards da home (2026-09-29)
+- Figma: nova página `Thumbnails` em cada arquivo de case (InvestIQ, Pulse, Aether, Forge, Casado, Reloop), com `Thumb — EN` e `Thumb — PT` a 1600×1000 feitos das telas Hi-Fi v3 (clones, não imagens).
+  - InvestIQ: browser do home desktop + phone da estratégia IA + card do total consolidado destacado (verde).
+  - Pulse: home do gerente comercial + 3 Insight Cards em leque (risco/oportunidade/no rumo).
+  - Aether: 2 phones (treino e real) em órbitas, banners "treino" (lilás) e "real" (âmbar) destacados.
+  - Forge: kit (modal, alertas, badges, tags, escalas blue/gray ligadas às variáveis) + board claro e escuro.
+  - Casado: catálogo, retirada e dia da Denise em leque + horários destacados.
+  - Reloop: página do produto + passo de classificação no phone + badge de estado ampliado.
+- Site: `public/assets/cases/<id>/{en,pt}/thumb.webp`; `Thumb` virou `{ src, w, h }`; `media.ts` usa `cover(id)`; card com thumb 16:10 em cor cheia e zoom leve no hover (respeita reduced motion).
+- Verificado: tsc/build ok, 6 capas carregando EN/PT, sem scroll horizontal em 390px.
+
+## Performance — revisão e otimização (2026-09-29)
+Medido com Playwright + CDP (1440×900, 160 passos de scroll com mouse em movimento), antes → depois:
+- Frames longos (>50ms) no scroll: home 24 → 0; InvestIQ 154 → 4; Reloop 151 → 1; Pulse 109 → 1.
+- Recalc de estilo no scroll: ~1,7–2,3s → ~0,2–0,4s por página.
+Causas e correções:
+- Backdrop: o drift do grid animava `background-position` em duas camadas fixas de tela inteira → repaint a cada frame. Agora anima `translate` (compositor), com 240px extras de grid embaixo.
+- Barra de progresso: animava `width` (layout por frame) → `scaleX`.
+- Parallax: `--pbx/--pby` eram escritas no `<html>` a cada movimento do mouse → restyle do documento todo. Agora só nos elementos `[data-parallax]` (backdrops, hero art, cenas de mockup) e só quando o valor muda.
+- `useDims`: listener de scroll com `getBoundingClientRect` em todos os réguas → IntersectionObserver.
+- Scroll spy: saiu do estado do App (re-render da página inteira a cada seção) para um store com `useSyncExternalStore`; só o header e o índice do case re-renderizam.
+- `useViewport`: não cria objeto novo em resize se nenhum breakpoint mudou.
+- Code splitting: CaseStudy + componentes de mockup + `media.ts` num chunk próprio, pré-carregado no idle. JS inicial 143 → 113 KB gzip. Sem React.lazy (suspenderia no 1º render e os efeitos de reveal rodariam sobre o placeholder).
+- Capas dos cards: caminho em `data/covers.ts` (home não importa mais `media.ts`), todas `loading="lazy"`.
+Verificado: tsc/build ok; reveals, réguas, índice ativo, parallax, voltar com scroll, troca EN/PT, clique rápido antes do prefetch, mobile sem scroll horizontal.

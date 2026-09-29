@@ -8,6 +8,13 @@ export function Footer({ t }: { t: Strings }) {
         <span>
           {config.name} — {t.role}
         </span>
+        {/* Contact at the bottom of every page, not only on the contact sheet. */}
+        <span className="footer__links">
+          <a href={`mailto:${config.email}`}>{config.email}</a>
+          <a href={config.linkedin} target="_blank" rel="noreferrer">
+            LinkedIn<span className="sr-only"> {t.newTab}</span>
+          </a>
+        </span>
         <span className="footer__rev">
           <span className="footer__mark" aria-hidden="true">
             <i />
@@ -16,7 +23,7 @@ export function Footer({ t }: { t: Strings }) {
             <i />
             <i />
           </span>
-          REV. 2026.08
+          {t.rev} 2026.09
         </span>
       </div>
     </footer>
