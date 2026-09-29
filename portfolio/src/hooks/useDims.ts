@@ -29,31 +29,40 @@ export function useDims(key: string, reduced: boolean): void {
       });
     };
 
-    const markReady = () => {
-      if (reduced) return;
+    // Rulers draw themselves once they come into view. An observer instead of
+    // a scroll listener: the listener measured every ruler on every scroll
+    // event, forcing a layout each time.
+    const io = reduced
+      ? null
+      : new IntersectionObserver(
+          (entries) =>
+            entries.forEach((e) => {
+              if (!e.isIntersecting) return;
+              io?.unobserve(e.target);
+              if (e.target.querySelector('[data-dimline]')) e.target.setAttribute('data-dim-ready', '1');
+            }),
+          { rootMargin: '0px 0px 50px 0px' },
+        );
+    const watched = new WeakSet<Element>();
+    const watch = () =>
       document.querySelectorAll('[data-dim]:not([data-dim-ready])').forEach((group) => {
-        const r = group.getBoundingClientRect();
-        if (!(r.top < window.innerHeight && r.bottom > -50)) return;
-        if (!group.querySelector('[data-dimline]')) return;
-        group.setAttribute('data-dim-ready', '1');
+        if (!io || watched.has(group)) return;
+        watched.add(group);
+        io.observe(group);
       });
-    };
 
     // Layout settles in stages (fonts, images, scroll-driven reveals).
     const timers = [0, 120, 400, 900, 1600].map((ms) =>
       window.setTimeout(() => {
         measureAll();
-        markReady();
+        watch();
       }, ms),
     );
-
-    const onScroll = () => markReady();
-    window.addEventListener('scroll', onScroll, { passive: true });
 
     return () => {
       timers.forEach(window.clearTimeout);
       ro?.disconnect();
-      window.removeEventListener('scroll', onScroll);
+      io?.disconnect();
     };
   }, [key, reduced]);
 }

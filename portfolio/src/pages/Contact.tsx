@@ -36,6 +36,18 @@ export function Contact({ t, vp }: Props) {
   /** A field only shows its error once the user has left it or tried to send. */
   const [touched, setTouched] = useState<Partial<Record<FieldName, boolean>>>({});
   const [sent, setSent] = useState(false);
+  /** Set on a failed send; one announcement instead of one per field. */
+  const [summary, setSummary] = useState(false);
+  const [copied, setCopied] = useState(false);
+
+  const copyEmail = async () => {
+    try {
+      await navigator.clipboard.writeText(config.email);
+      setCopied(true);
+    } catch {
+      // Clipboard blocked: the address is on screen to select by hand.
+    }
+  };
 
   const set = (name: FieldName) => (e: { target: { value: string } }) => {
     setValues((v) => ({ ...v, [name]: e.target.value }));
@@ -56,6 +68,7 @@ export function Contact({ t, vp }: Props) {
     setTouched({ name: true, email: true, message: true });
 
     const first = (['name', 'email', 'message'] as const).find((k) => found[k]);
+    setSummary(Boolean(first));
     if (first) {
       document.getElementById(`${uid}-${first}`)?.focus();
       return;
@@ -100,7 +113,7 @@ export function Contact({ t, vp }: Props) {
         )}
 
         {error && (
-          <p className="field__error" id={`${id}-err`} role="alert">
+          <p className="field__error" id={`${id}-err`}>
             <span aria-hidden="true">!</span>
             {error}
           </p>
@@ -110,9 +123,9 @@ export function Contact({ t, vp }: Props) {
   };
 
   return (
-    <main className="page page--contact">
+    <main id="content" tabIndex={-1} className="page page--contact">
       <div data-reveal className="reveal">
-        <FigRule label={`SHEET 05 — ${t.contactLabel}`} style={{ marginBottom: 24 }} />
+        <FigRule prefix={`${t.sheet} 05`} label={t.contactLabel} style={{ marginBottom: 24 }} />
 
         <div data-title-exit className="title-exit">
           <DimV show={vp.rulers} />
@@ -131,6 +144,12 @@ export function Contact({ t, vp }: Props) {
           {field('name', t.fName)}
           {field('email', t.fEmail)}
           {field('message', t.fMessage, 6)}
+
+          {/* Focus lands on the first invalid field, which reads its own error;
+              this names the situation once instead of three alerts at once. */}
+          <p className="field__summary" role="alert">
+            {summary && Object.keys(errors).length > 0 && t.errSummary}
+          </p>
 
           <button type="submit" className="btn btn--primary contact__send">
             {t.send}
@@ -154,22 +173,30 @@ export function Contact({ t, vp }: Props) {
 
         <aside data-reveal className="reveal contact-aside">
           <div className="contact-aside__row">
-            <div className="contact-aside__k">EMAIL</div>
+            <div className="contact-aside__k">{t.kEmail}</div>
             <a className="contact-aside__v contact-aside__v--break" href={`mailto:${config.email}`}>
               {config.email}
             </a>
+            {/* For webmail users, whose browser does nothing with mailto:. */}
+            <button type="button" className="btn btn--ghost btn--nav contact-aside__copy" onClick={copyEmail}>
+              {copied ? t.copied : t.copyEmail}
+            </button>
+            <span className="sr-only" role="status">
+              {copied ? t.copied : ''}
+            </span>
           </div>
 
           <div className="contact-aside__row">
             <div className="contact-aside__k">LINKEDIN</div>
             <a className="contact-aside__v" href={config.linkedin} target="_blank" rel="noreferrer">
               /in/eduardo-azuolas
+              <span className="sr-only"> {t.newTab}</span>
             </a>
           </div>
 
           <div className="contact-aside__row">
-            <div className="contact-aside__k">LOCATION</div>
-            <div className="contact-aside__v">São Paulo, Brazil · GMT-3</div>
+            <div className="contact-aside__k">{t.kLocation}</div>
+            <div className="contact-aside__v">{t.location}</div>
           </div>
 
           <div className="contact-aside__row">

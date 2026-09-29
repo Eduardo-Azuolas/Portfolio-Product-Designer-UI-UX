@@ -3,8 +3,8 @@ export function Backdrop() {
   return (
     <>
       <div data-noprint data-scroll-plot className="scroll-plot" aria-hidden="true" />
-      <div className="backdrop backdrop--fine" aria-hidden="true" />
-      <div className="backdrop backdrop--coarse" aria-hidden="true" />
+      <div data-parallax className="backdrop backdrop--fine" aria-hidden="true" />
+      <div data-parallax className="backdrop backdrop--coarse" aria-hidden="true" />
       <div className="vignette" aria-hidden="true" />
     </>
   );

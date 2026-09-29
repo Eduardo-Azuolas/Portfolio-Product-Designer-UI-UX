@@ -1,14 +1,32 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState, type CSSProperties } from 'react';
 import { CASES } from '../data/cases';
 import { SECTIONS } from '../data/sections';
 import { SECTION_COLS } from '../data/slots';
 import { MEDIA } from '../data/media';
 import { DimH, DimV } from '../components/Dim';
 import { Figure } from '../components/Figure';
+import { Device, travel } from '../components/Device';
+import { MockupScene } from '../components/MockupScene';
+import { ScreenSequence } from '../components/ScreenSequence';
+import { Spotlight } from '../components/Spotlight';
+import { WireGrid } from '../components/WireGrid';
+import { FlowStrip } from '../components/FlowStrip';
+import { ComparePair } from '../components/ComparePair';
+import { ViewSwitcher } from '../components/ViewSwitcher';
+import { LensView } from '../components/LensView';
+import { ThemeSlider } from '../components/ThemeSlider';
+import { Anatomy } from '../components/Anatomy';
+import { PickupSync } from '../components/PickupSync';
+import { Lanes } from '../components/Lanes';
+import { HangTag } from '../components/HangTag';
+import { BadgeTrail } from '../components/BadgeTrail';
 import { FigRule } from '../components/FigRule';
+import { RouteLink } from '../components/RouteLink';
+import { routeHref } from '../hooks/useRoute';
+import { useActiveSection } from '../hooks/useScrollSpy';
 import { pick } from '../i18n/pick';
 import type { Strings } from '../i18n/strings';
-import type { Lang, Metric, SlotImage } from '../types';
+import type { Lang, Localized, Metric, Page, SlotImage, Stage } from '../types';
 import type { Viewport } from '../hooks/useViewport';
 
 type Props = {
@@ -16,9 +34,9 @@ type Props = {
   t: Strings;
   lang: Lang;
   vp: Viewport;
-  active: string;
   reduced: boolean;
   onOpenCase: (index: number) => void;
+  onNavigate: (page: Page) => void;
 };
 
 type Slot = { img: SlotImage };
@@ -32,17 +50,68 @@ type Section = {
   size: string;
   pad: string;
   gap: string;
-  coord: string;
   note?: string;
   slots?: Slot[];
   slotCols?: string;
+  slotLabel?: Localized;
+  stagger?: boolean;
+  stages?: Stage[];
 };
 
 const pad2 = (n: number) => String(n).padStart(2, '0');
 
-export function CaseStudy({ index, t, lang, vp, active, reduced, onOpenCase }: Props) {
+type IndexItem = { key: string; label: string; n: string };
+
+/**
+ * The figure index's buttons. Its own component so that it alone re-renders
+ * when the reading band crosses a section, not the sheet around it.
+ */
+function IndexButtons({
+  items,
+  className,
+  itemClass,
+  onPick,
+}: {
+  items: IndexItem[];
+  className: string;
+  itemClass?: string;
+  onPick: (key: string) => void;
+}) {
+  const active = useActiveSection();
+  return (
+    <>
+      {items.map((s) => (
+        <li key={s.key} className={itemClass}>
+          <button
+            type="button"
+            className={className}
+            aria-current={active === s.key ? 'true' : undefined}
+            onClick={() => onPick(s.key)}
+          >
+            <span className="n">{s.n}</span>
+            {s.label}
+          </button>
+        </li>
+      ))}
+    </>
+  );
+}
+
+export function CaseStudy({ index, t, lang, vp, reduced, onOpenCase, onNavigate }: Props) {
   const [sheetOpen, setSheetOpen] = useState(false);
   const sheetRef = useRef<HTMLDialogElement>(null);
+  const zoomRef = useRef<HTMLDialogElement>(null);
+  const [zoom, setZoom] = useState<SlotImage | null>(null);
+
+  // Closing a <dialog> drops focus on <body>, which loses a keyboard user's
+  // place in a sheet that is mostly figures. Remember the button that opened
+  // the viewer and hand focus back to it.
+  const zoomOpener = useRef<HTMLElement | null>(null);
+  const openZoom = (img: SlotImage) => {
+    zoomOpener.current = document.activeElement as HTMLElement | null;
+    setZoom(img);
+    zoomRef.current?.showModal();
+  };
   const cs = CASES[index];
   const media = MEDIA[cs.id];
 
@@ -68,11 +137,17 @@ export function CaseStudy({ index, t, lang, vp, active, reduced, onOpenCase }: P
   const closeSheet = () => sheetRef.current?.close();
 
   // The header offset lives in CSS as scroll-margin-top on [data-sec], so this
-  // no longer carries its own copy of the header height.
+  // no longer carries its own copy of the header height. Focus follows the
+  // scroll, so the next Tab continues from the section, not from the index.
   const jump = (id: string) => {
-    document
-      .getElementById(id)
-      ?.scrollIntoView({ behavior: reduced ? 'auto' : 'smooth', block: 'start' });
+    const section = document.getElementById(id);
+    if (!section) return;
+    section.scrollIntoView({ behavior: reduced ? 'auto' : 'smooth', block: 'start' });
+    const heading = section.querySelector<HTMLElement>('h1, h2');
+    if (heading) {
+      heading.tabIndex = -1;
+      heading.focus({ preventScroll: true });
+    }
   };
 
   const sections: Section[] = useMemo(
@@ -88,19 +163,30 @@ export function CaseStudy({ index, t, lang, vp, active, reduced, onOpenCase }: P
           size: thin ? '15px' : '17px',
           pad: thin ? '44px' : '72px',
           gap: thin ? '14px' : '22px',
-          coord: `X: ${120 + i * 24} Y: ${88 + i * 56}`,
         };
 
         if (thin) item.note = t.thin;
+
+        const stages = media?.stages?.[key];
+        if (!thin && stages?.length) item.stages = stages;
+        item.slotLabel = media?.slotLabels?.[key];
+        item.stagger = media?.stagger?.[key];
 
         // Only real images render. A section with none simply has no figure
         // grid — no reserved space, no empty frame.
         const shots = (media?.slots?.[key] ?? []).filter((s): s is SlotImage => Boolean(s));
         if (!thin && shots.length) {
           item.slots = shots.map((img) => ({ img }));
-          item.slotCols =
-            media?.cols?.[key] ??
-            (vp.mob ? (vp.narrow ? '1fr' : 'repeat(2,1fr)') : SECTION_COLS[key] ?? '1fr');
+          // A case's column override is a desktop decision; on a phone two
+          // 1936px frames side by side are 160px wide and unreadable.
+          // Phones in devices stay two across even on a phone: one device at
+          // full width is taller than the screen showing it.
+          const devices = shots.every((img) => img.device === 'phone' || img.span);
+          item.slotCols = vp.mob
+            ? vp.narrow && !devices
+              ? '1fr'
+              : 'repeat(2,1fr)'
+            : media?.cols?.[key] ?? SECTION_COLS[key] ?? '1fr';
         }
 
         return item;
@@ -121,16 +207,21 @@ export function CaseStudy({ index, t, lang, vp, active, reduced, onOpenCase }: P
   // The three numbers open the case rather than closing it, and the note that
   // qualifies them travels with them.
   const metrics = cs.s.metrics.map((m: Metric) => ({
-    v: m.v,
+    v: pick(m.v, lang),
     k: pick(m.k, lang),
-    src: m.proj ? t.projectedTag : t.measuredTag,
+    src: m.basis === 'target' ? t.targetTag : m.proj ? t.projectedTag : t.measuredTag,
   }));
-  const metricsNote = cs.s.metrics.some((m) => m.proj) ? t.projected : t.measured;
+  const metricsNote = cs.s.metrics.every((m) => m.basis === 'target')
+    ? t.target
+    : cs.s.metrics.some((m) => m.proj)
+      ? t.projected
+      : t.measured;
 
-  const spec = (['role', 'duration', 'team', 'tools', 'platform'] as const).map((k) => ({
-    k: t.spec[k],
-    v: pick(cs.spec[k], lang),
-  }));
+  // A row with no honest value is left out rather than shown as a dash.
+  const spec = (['role', 'duration', 'team', 'tools', 'platform'] as const).flatMap((k) => {
+    const value = cs.spec[k];
+    return value ? [{ k: t.spec[k], v: pick(value, lang) }] : [];
+  });
 
   const highlights = [
     { k: t.kProblem, v: pick(cs.hi.p, lang) },
@@ -138,30 +229,20 @@ export function CaseStudy({ index, t, lang, vp, active, reduced, onOpenCase }: P
     { k: t.kOutcome, v: pick(cs.hi.o, lang) },
   ];
 
-  const prev = CASES[(index + CASES.length - 1) % CASES.length];
-  const next = CASES[(index + 1) % CASES.length];
+  const prevIndex = (index + CASES.length - 1) % CASES.length;
+  const nextIndex = (index + 1) % CASES.length;
+  const prev = CASES[prevIndex];
+  const next = CASES[nextIndex];
 
   return (
-    <main className="page page--case">
+    <main id="content" tabIndex={-1} className="page page--case">
       <div className="case__grid">
         {!vp.mob && (
           <nav data-noprint data-thin-scroll className="case-index" aria-label={t.indexLabel}>
             <div className="case-index__inner">
               <div className="case-index__label">{t.indexLabel}</div>
-              <ul className="case-index__list">
-                {indexItems.map((s) => (
-                  <li key={s.key}>
-                    <button
-                      type="button"
-                      className="case-index__btn"
-                      aria-current={active === s.key}
-                      onClick={() => jump(`sec-${s.key}`)}
-                    >
-                      <span className="n">{s.n}</span>
-                      {s.label}
-                    </button>
-                  </li>
-                ))}
+              <ul role="list" className="case-index__list">
+                <IndexButtons items={indexItems} className="case-index__btn" onPick={(key) => jump(`sec-${key}`)} />
               </ul>
             </div>
           </nav>
@@ -172,7 +253,8 @@ export function CaseStudy({ index, t, lang, vp, active, reduced, onOpenCase }: P
           <section id="sec-hero" data-sec="hero" style={{ paddingTop: 24 }}>
             <div data-reveal className="reveal">
               <FigRule
-                label={`FIG. 01 — ${t.secResults}`}
+                prefix="FIG. 01"
+                label={t.secResults}
                 meta={`SPEC-${cs.code}`}
                 style={{ marginBottom: 22 }}
               />
@@ -186,6 +268,27 @@ export function CaseStudy({ index, t, lang, vp, active, reduced, onOpenCase }: P
               <p className="case__line">{pick(cs.line, lang)}</p>
               <DimH style={{ maxWidth: 720, marginTop: 18 }} />
 
+              {media?.hero && (
+                <div className="case__hero-scene">
+                  <MockupScene scene={media.hero} lang={lang} eager />
+                </div>
+              )}
+              {!media?.hero && media?.heroCompare && (
+                <div className="case__hero-scene">
+                  <ThemeSlider {...media.heroCompare} lang={lang} eager />
+                </div>
+              )}
+              {!media?.hero && !media?.heroCompare && !media?.heroSync && media?.heroTag && (
+                <div className="case__hero-scene">
+                  <HangTag {...media.heroTag} lang={lang} eager />
+                </div>
+              )}
+              {!media?.hero && !media?.heroCompare && media?.heroSync && (
+                <div className="case__hero-scene">
+                  <PickupSync {...media.heroSync} lang={lang} mob={vp.mob} eager />
+                </div>
+              )}
+
               <div className="hairgrid results">
                 <DimV show={vp.rulers} />
                 {metrics.map((m) => (
@@ -197,7 +300,7 @@ export function CaseStudy({ index, t, lang, vp, active, reduced, onOpenCase }: P
                 ))}
               </div>
               <div className="note">
-                <span className="note__star">*</span>
+                <span className="note__star" aria-hidden="true">*</span>
                 {metricsNote}
               </div>
             </div>
@@ -205,7 +308,7 @@ export function CaseStudy({ index, t, lang, vp, active, reduced, onOpenCase }: P
 
           {/* FIG. 02 — at a glance */}
           <section id="sec-glance" data-sec="glance" data-reveal className="reveal" style={{ paddingTop: 72 }}>
-            <FigRule as="h2" label={`FIG. 02 — ${t.secGlance}`} style={{ marginBottom: 22 }} />
+            <FigRule as="h2" prefix="FIG. 02" label={t.secGlance} style={{ marginBottom: 22 }} />
 
             <div className="hairgrid spec-grid">
               <DimV show={vp.rulers} />
@@ -244,51 +347,151 @@ export function CaseStudy({ index, t, lang, vp, active, reduced, onOpenCase }: P
               className="reveal"
               style={{ paddingTop: s.pad }}
             >
-              <FigRule
-                as="h2"
-                label={`FIG. ${s.n} — ${s.label}`}
-                meta={s.coord}
-                metaDim
-                style={{ marginBottom: s.gap }}
-              />
+              <FigRule as="h2" prefix={`FIG. ${s.n}`} label={s.label} style={{ marginBottom: s.gap }} />
 
               <p className="case-section__body" style={{ fontSize: s.size }}>
                 {s.body}
               </p>
 
+              {s.stages?.map((st, i) => (
+                <div key={`${s.key}-stage-${i}`} className={`stage stage--${st.kind}`}>
+                  {st.label && <h3 className="stage__label">{st.label[lang]}</h3>}
+                  {st.kind === 'scene' && <MockupScene scene={st.scene} lang={lang} />}
+                  {st.kind === 'sequence' && (
+                    <ScreenSequence steps={st.steps} lang={lang} mob={vp.mob} label={st.label?.[lang] ?? s.label} />
+                  )}
+                  {st.kind === 'wires' && (
+                    <WireGrid
+                      tiles={st.tiles}
+                      notes={st.notes}
+                      cols={st.cols}
+                      device={st.device}
+                      notesLabel={st.notesLabel}
+                      lang={lang}
+                      mob={vp.mob}
+                      enlargeLabel={t.enlarge}
+                      onEnlarge={openZoom}
+                    />
+                  )}
+                  {st.kind === 'strip' && (
+                    <FlowStrip steps={st.steps} lang={lang} mob={vp.mob} enlargeLabel={t.enlarge} onEnlarge={openZoom} />
+                  )}
+                  {st.kind === 'tabs' && (
+                    <ViewSwitcher
+                      tabs={st.tabs}
+                      device={st.device}
+                      url={st.url}
+                      numbered={st.numbered}
+                      caption={st.caption}
+                      lang={lang}
+                      mob={vp.mob}
+                    />
+                  )}
+                  {st.kind === 'lens' && (
+                    <LensView screen={st.screen} url={st.url} lenses={st.lenses} caption={st.caption} lang={lang} mob={vp.mob} />
+                  )}
+                  {st.kind === 'pair' && (
+                    <ComparePair
+                      left={st.left}
+                      right={st.right}
+                      notes={st.notes}
+                      caption={st.caption}
+                      lang={lang}
+                      mob={vp.mob}
+                    />
+                  )}
+                  {st.kind === 'trail' && (
+                    <BadgeTrail stops={st.stops} caption={st.caption} lang={lang} mob={vp.mob} enlargeLabel={t.enlarge} onEnlarge={openZoom} />
+                  )}
+                  {st.kind === 'lanes' && (
+                    <Lanes
+                      cols={st.cols}
+                      lanes={st.lanes}
+                      links={st.links}
+                      notesLabel={st.notesLabel}
+                      caption={st.caption}
+                      lang={lang}
+                      mob={vp.mob}
+                      enlargeLabel={t.enlarge}
+                      onEnlarge={openZoom}
+                    />
+                  )}
+                  {st.kind === 'anatomy' && (
+                    <Anatomy screen={st.screen} url={st.url} parts={st.parts} caption={st.caption} lang={lang} mob={vp.mob} />
+                  )}
+                  {st.kind === 'spotlight' && (
+                    <Spotlight
+                      device={st.device}
+                      screen={st.screen}
+                      notes={st.notes}
+                      caption={st.caption}
+                      lang={lang}
+                      mob={vp.mob}
+                    />
+                  )}
+                </div>
+              ))}
+
+              {s.slots && s.slotLabel && <h3 className="stage__label stage__label--slots">{s.slotLabel[lang]}</h3>}
+
               {s.slots && (
-                <div className="case-slots" style={{ gridTemplateColumns: s.slotCols }}>
+                <div className={`case-slots${s.stagger ? ' case-slots--stagger' : ''}`} style={{ gridTemplateColumns: s.slotCols }}>
                   {s.slots.map((p, i) => (
-                    <Figure key={`${s.key}-${i}`} img={p.img} lang={lang} />
+                    <Figure
+                      key={`${s.key}-${i}`}
+                      img={p.img}
+                      lang={lang}
+                      enlargeLabel={t.enlarge}
+                      onEnlarge={openZoom}
+                      gridColumn={p.img.span ? (vp.mob ? (p.img.device === 'phone' ? undefined : '1 / -1') : `span ${p.img.span}`) : undefined}
+                    />
                   ))}
                 </div>
               )}
 
               {s.note && (
                 <div className="note">
-                  <span className="note__star">*</span>
+                  <span className="note__star" aria-hidden="true">*</span>
                   {s.note}
                 </div>
               )}
             </section>
           ))}
 
-          <div data-reveal className="reveal reveal--fade case-nav">
-            <button
-              type="button"
+          {/* The reviewer is most interested right here, at the end of a case. */}
+          <section data-reveal className="reveal cta-band cta-band--case">
+            <div>
+              <div className="cta-band__label">{t.caseCtaLabel}</div>
+              <h2 className="cta-band__heading">{t.ctaHeading}</h2>
+            </div>
+            <div className="cta-band__actions">
+              <RouteLink className="btn btn--primary" href={routeHref('contact')} onNavigate={() => onNavigate('contact')}>
+                {t.ctaContact}
+              </RouteLink>
+              <RouteLink className="btn btn--ghost" href={routeHref('resume')} onNavigate={() => onNavigate('resume')}>
+                {t.ctaResume}
+              </RouteLink>
+            </div>
+          </section>
+
+          <nav data-reveal className="reveal reveal--fade case-nav" aria-label={t.nav.work}>
+            <RouteLink
               className="btn btn--ghost btn--nav"
-              onClick={() => onOpenCase((index + CASES.length - 1) % CASES.length)}
+              href={routeHref('cs', prevIndex)}
+              onNavigate={() => onOpenCase(prevIndex)}
             >
-              ← {prev.name}
-            </button>
-            <button
-              type="button"
+              <span aria-hidden="true">← </span>
+              {prev.name}
+            </RouteLink>
+            <RouteLink
               className="btn btn--ghost btn--nav"
-              onClick={() => onOpenCase((index + 1) % CASES.length)}
+              href={routeHref('cs', nextIndex)}
+              onNavigate={() => onOpenCase(nextIndex)}
             >
-              {next.name} →
-            </button>
-          </div>
+              {next.name}
+              <span aria-hidden="true"> →</span>
+            </RouteLink>
+          </nav>
         </div>
       </div>
 
@@ -324,24 +527,85 @@ export function CaseStudy({ index, t, lang, vp, active, reduced, onOpenCase }: P
             ✕
           </button>
         </div>
-        <ul className="sheet__list">
-          {indexItems.map((s) => (
-            <li key={s.key} className="sheet__item">
-              <button
-                type="button"
-                className="sheet__btn"
-                aria-current={active === s.key}
-                onClick={() => {
-                  closeSheet();
-                  jump(`sec-${s.key}`);
-                }}
-              >
-                <span className="n">{s.n}</span>
-                {s.label}
-              </button>
-            </li>
-          ))}
+        <ul role="list" className="sheet__list">
+          <IndexButtons
+            items={indexItems}
+            className="sheet__btn"
+            itemClass="sheet__item"
+            onPick={(key) => {
+              closeSheet();
+              jump(`sec-${key}`);
+            }}
+          />
         </ul>
+      </dialog>
+
+      <dialog
+        data-noprint
+        ref={zoomRef}
+        className={`zoom${zoom?.device ? ' zoom--device' : ''}`}
+        aria-label={zoom ? pick(zoom.caption, lang) : t.enlarge}
+        onClose={() => {
+          setZoom(null);
+          zoomOpener.current?.focus();
+          zoomOpener.current = null;
+        }}
+        onClick={(e) => {
+          if (e.target === zoomRef.current) zoomRef.current?.close();
+        }}
+      >
+        <div className="zoom__head">
+          <p className="zoom__cap">{zoom && pick(zoom.caption, lang)}</p>
+          <button
+            type="button"
+            className="sheet__close"
+            aria-label={t.close}
+            onClick={() => zoomRef.current?.close()}
+          >
+            ✕
+          </button>
+        </div>
+        {zoom &&
+          (zoom.device ? (
+            // Screens open in their device at a readable size rather than
+            // blown up to the viewport; a screen taller than the device
+            // scrolls inside it, the way it would on the real thing.
+            <div className={`zoom__body zoom__body--${zoom.device}`}>
+              <Device kind={zoom.device} className={`zoom__device${zoom.wire ? ' device--wire' : ''}`}>
+                {zoom.device === 'phone' && !zoom.wire && (
+                  // The status bar stays put while the screen scrolls under it.
+                  <span
+                    className="zoom__status"
+                    aria-hidden="true"
+                    style={{ backgroundImage: `url("${pick((zoom.full ?? zoom).src, lang)}")` }}
+                  />
+                )}
+                <div className="zoom__scroll" tabIndex={0} aria-label={t.scrollScreen} data-thin-scroll>
+                  <img
+                    className="zoom__screen"
+                    src={pick((zoom.full ?? zoom).src, lang)}
+                    alt={zoom.alt ? pick(zoom.alt, lang) : ''}
+                    width={(zoom.full ?? zoom).w}
+                    height={(zoom.full ?? zoom).h}
+                  />
+                </div>
+              </Device>
+              {travel(zoom.device, zoom.full ?? zoom) > 0 && <p className="zoom__hint">{t.scrollScreen}</p>}
+            </div>
+          ) : (
+            <div
+              className={`zoom__body${zoom.ground ? ' figure__frame--ground' : ''}`}
+              style={zoom.ground ? ({ '--glow': zoom.ground } as CSSProperties) : undefined}
+            >
+              <img
+                className="zoom__img"
+                src={pick(zoom.src, lang)}
+                alt={zoom.alt ? pick(zoom.alt, lang) : ''}
+                width={zoom.w}
+                height={zoom.h}
+              />
+            </div>
+          ))}
       </dialog>
     </main>
   );

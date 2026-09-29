@@ -29,7 +29,7 @@ export function HeroArt({ show, showAnnotations }: { show: boolean; showAnnotati
   if (!show) return null;
 
   return (
-    <div data-noprint data-hero-art className="hero__art" aria-hidden="true">
+    <div data-noprint data-hero-art data-parallax className="hero__art" aria-hidden="true">
       <svg viewBox="0 0 520 520" fill="none" preserveAspectRatio="xMidYMid meet">
         <g
           style={{
@@ -95,7 +95,7 @@ export function HeroArt({ show, showAnnotations }: { show: boolean; showAnnotati
                   animationDelay: '1.28s, 1.28s, 3.4s',
                   animationTimingFunction: 'cubic-bezier(.62,.03,.3,1), cubic-bezier(.16,.84,.3,1), ease-in-out',
                   animationFillMode: 'both, both, none',
-                  animationIterationCount: '1, 1, infinite',
+                  animationIterationCount: '1, 1, 3',
                 }}
               />
               <text x={440} y={266} textAnchor="middle" style={{ ...ANNO, animation: 'pbInRight .7s cubic-bezier(.16,.84,.3,1) 1.34s both' }}>
@@ -107,7 +107,7 @@ export function HeroArt({ show, showAnnotations }: { show: boolean; showAnnotati
                 R24
               </text>
 
-              <g style={{ animation: 'pbNudge 11s ease-in-out 3s infinite' }}>
+              <g style={{ animation: 'pbNudge 11s ease-in-out 3s 3' }}>
                 <text x={132} y={144} textAnchor="start" style={{ ...ANNO, animation: 'pbAnno .7s cubic-bezier(.16,.84,.3,1) 1.5s both' }}>
                   01
                 </text>
@@ -145,13 +145,13 @@ export function HeroArt({ show, showAnnotations }: { show: boolean; showAnnotati
               transition: 'transform 1.15s cubic-bezier(.16,.84,.3,1)',
             }}
           >
-            <g style={{ animation: 'pbCrossDrift 16s ease-in-out 3s infinite' }}>
+            <g style={{ animation: 'pbCrossDrift 16s ease-in-out 3s 2' }}>
               <g
                 style={{
                   transformBox: 'fill-box',
                   transformOrigin: 'center',
                   opacity: 0.32,
-                  animation: 'pbInPop .7s cubic-bezier(.16,.84,.3,1) 1.9s both, pbPulse 6s ease-in-out 3s infinite',
+                  animation: 'pbInPop .7s cubic-bezier(.16,.84,.3,1) 1.9s both, pbPulse 6s ease-in-out 3s 3',
                 }}
               >
                 <path d="M440,286 V314" stroke="#3FD0FF" strokeWidth={1} />

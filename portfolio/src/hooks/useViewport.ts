@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react';
 
 export type Viewport = {
-  w: number;
   /** Below the two-column threshold. */
   mob: boolean;
   /** Phone-width: single column, abbreviated nav. */
@@ -14,7 +13,6 @@ export type Viewport = {
 
 function read(w: number): Viewport {
   return {
-    w,
     mob: w < 900,
     narrow: w < 680,
     rulers: w >= 1360,
@@ -35,7 +33,17 @@ export function useViewport(): Viewport {
       if (frame) return;
       frame = requestAnimationFrame(() => {
         frame = 0;
-        setVp(read(window.innerWidth));
+        const next = read(window.innerWidth);
+        // Same breakpoints, same object: a drag-resize used to re-render the
+        // whole app on every frame even when no layout decision changed.
+        setVp((prev) =>
+          prev.mob === next.mob &&
+          prev.narrow === next.narrow &&
+          prev.rulers === next.rulers &&
+          prev.heroArt === next.heroArt
+            ? prev
+            : next,
+        );
       });
     };
 
