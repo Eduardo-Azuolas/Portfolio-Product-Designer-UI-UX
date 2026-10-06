@@ -31,10 +31,10 @@ export const CV: Record<Lang, Cv> = {
         org: 'Freelance — São Paulo, Brazil · Remote',
         bullets: [
           'Redesigned a B2B finance analytics dashboard for a client under NDA around role-based insight cards: −35% time to first action, +22% feature adoption and +18% 30-day retention in the 60 days after launch.',
-          'Design responsive web and app experiences from discovery to high-fidelity UI, including a pickup-first ordering app now in use by a home bakery.',
+          'Designed a pickup-first ordering app for a home bakery, now in use: two connected apps (customer and baker) across 12 screens plus 5 edge states, with each order synced to both Google Calendars.',
           'Run discovery before development: 10 user interviews, an 80-user survey and prototype tests of three directions on the dashboard project.',
-          'Create user flows, wireframes, prototypes, and scalable UI in Figma using Auto Layout, components, variants, and reusable patterns.',
-          'Build style guides and design documentation while collaborating with stakeholders and developers to deliver consistent, feasible solutions.',
+          'Create user flows, wireframes, prototypes and scalable UI in Figma with Auto Layout, components and variants; the dashboard alone ran to 17 screens, covering three role-based homes, drill-downs, a mobile companion and five system states.',
+          'Build component libraries and documentation engineers can build from: 17 components for the dashboard and 18 for the ordering app, with every text color passing WCAG AA.',
         ],
       },
       {
@@ -140,10 +140,10 @@ export const CV: Record<Lang, Cv> = {
         org: 'Freelance — São Paulo, Brasil · Remoto',
         bullets: [
           'Redesenhei um dashboard de analytics financeiro B2B para um cliente sob NDA, com cards de insight por papel: −35% no tempo até a primeira ação, +22% de adoção de features e +18% de retenção em 30 dias nos 60 dias após o lançamento.',
-          'Desenho experiências web e app responsivas, da descoberta à UI de alta fidelidade, incluindo um app de pedidos com retirada em uso por uma confeitaria caseira.',
+          'Desenhei um app de pedidos com retirada para uma confeitaria caseira, hoje em uso: dois apps conectados (cliente e confeiteira) em 12 telas mais 5 estados de exceção, com cada pedido sincronizado nas duas agendas do Google.',
           'Faço descoberta antes do desenvolvimento: 10 entrevistas com usuários, uma pesquisa com 80 usuários e testes de protótipo de três direções no projeto do dashboard.',
-          'Crio fluxos, wireframes, protótipos e UI escalável no Figma usando Auto Layout, componentes, variants e padrões reutilizáveis.',
-          'Construo style guides e documentação de design, colaborando com stakeholders e desenvolvedores para entregar soluções consistentes e viáveis.',
+          'Crio fluxos, wireframes, protótipos e UI escalável no Figma com Auto Layout, componentes e variants; só o dashboard teve 17 telas, cobrindo três homes por papel, drill-downs, um companion mobile e cinco estados de sistema.',
+          'Construo bibliotecas de componentes e documentação que a engenharia consegue executar: 17 componentes no dashboard e 18 no app de pedidos, com todas as cores de texto passando no WCAG AA.',
         ],
       },
       {
