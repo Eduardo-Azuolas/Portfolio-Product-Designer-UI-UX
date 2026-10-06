@@ -28,7 +28,7 @@ export function Resume({ t, lang, vp }: Props) {
         <a
           data-noprint
           className="btn btn--primary resume__download"
-          href={config.resumeHref}
+          href={config.resumeHref[lang] ?? config.resumeHref.en}
           download
         >
           {t.downloadResume}

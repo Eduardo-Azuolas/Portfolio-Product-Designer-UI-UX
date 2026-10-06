@@ -116,7 +116,7 @@ export const strings = {
     secTargets: 'METAS DE SUCESSO',
     secGlance: 'RESUMO RÁPIDO',
     resumeLabel: 'CURRÍCULO',
-    downloadResume: 'BAIXAR CURRÍCULO (PDF, 61 KB)',
+    downloadResume: 'BAIXAR CURRÍCULO (PDF, 63 KB)',
     contactLabel: 'CONTATO',
     contactHeading: 'Me conte o que você está construindo e onde travou.',
     fName: 'NOME',
