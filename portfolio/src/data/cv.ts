@@ -87,8 +87,8 @@ export const CV: Record<Lang, Cv> = {
     certLabel: 'CERTIFICATIONS',
     certs: [
       'AI Festival Workshop — Tera',
-      'UX and Design with AI — UX Unicórnio',
-      'AI UX Lab Workshop — Tera',
+      'UX and Design with AI — Tera',
+      'AI UX Lab Workshop — UX Unicórnio',
       'Figma Certification — Kodree',
       'React Specialization — Rocketseat',
       'Fullstack WebDev Bootcamp — Digital House',
@@ -196,8 +196,8 @@ export const CV: Record<Lang, Cv> = {
     certLabel: 'CERTIFICAÇÕES',
     certs: [
       'AI Festival Workshop — Tera',
-      'UX and Design with AI — UX Unicórnio',
-      'AI UX Lab Workshop — Tera',
+      'UX and Design with AI — Tera',
+      'AI UX Lab Workshop — UX Unicórnio',
       'Certificação Figma — Kodree',
       'Especialização React — Rocketseat',
       'Bootcamp Fullstack WebDev — Digital House',
