@@ -36,7 +36,9 @@ export function useReveal(key: string, reduced: boolean): void {
           io.unobserve(e.target);
         });
       },
-      { threshold: 0.08 },
+      // Starts the fade a little before the section arrives, so a fast scroll
+      // never lands on an empty band.
+      { threshold: 0.08, rootMargin: '0px 0px 10% 0px' },
     );
     nodes.forEach((n) => io.observe(n));
 

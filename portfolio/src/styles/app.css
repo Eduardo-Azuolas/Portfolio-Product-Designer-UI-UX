@@ -552,12 +552,15 @@ a.menu__btn { display: flex; align-items: center; }
   margin: 0 -22px;
   border-top: 1px solid var(--rule);
   display: grid;
-  grid-template-columns: 1fr 1fr 1.3fr;
+  grid-template-columns: 1.7fr 0.7fr 1.2fr;
   font-family: var(--mono);
   font-size: 12px;
   letter-spacing: 0.14em;
 }
 .plate__foot > span { color: var(--label-5); }
+/* Where the work stands is the first thing a reviewer triages by, so it reads
+   brighter than the year and wraps rather than truncating. */
+.plate__foot > .plate__status { color: var(--label-1); line-height: 1.5; text-transform: uppercase; }
 .plate__foot > span:nth-child(1) { padding: 14px 8px 14px 22px; }
 .plate__foot > span:nth-child(2) { padding: 14px 8px; border-left: 1px solid var(--rule-soft); }
 .plate__foot > span:nth-child(3) {
@@ -1107,7 +1110,8 @@ a.contact-aside__v:active { color: var(--accent); }
      brand and the language pair. They come back at this step, not at 680. */
   .nav { display: flex; }
   .nav-toggle { display: none; }
-  .plate-grid { grid-template-columns: repeat(3, 1fr); }
+  /* Four featured sheets sit as a 2×2 rather than three and an orphan. */
+  .plate-grid { grid-template-columns: repeat(2, 1fr); }
   .about__head { grid-template-columns: minmax(0, 1fr) 280px; }
   .about__grid { grid-template-columns: 1.5fr 1fr; }
   .case__grid { grid-template-columns: 186px minmax(0, 1fr); }
@@ -1199,3 +1203,24 @@ a.contact-aside__v:active { color: var(--accent); }
 
 /* The three headline numbers that open a case study. */
 .results { position: relative; margin-top: 34px; }
+
+/* ── Home: proof line under the lede ──────────────────────────────────── */
+.hero__proof {
+  margin: 18px 0 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 14px;
+  align-items: baseline;
+  font-family: var(--mono);
+  font-size: 12px;
+  letter-spacing: 0.08em;
+  line-height: 1.6;
+}
+.hero__proof-label { color: var(--label-5); letter-spacing: 0.14em; }
+.hero__proof-link {
+  color: var(--accent);
+  text-decoration: underline;
+  text-decoration-color: color-mix(in srgb, var(--accent) 40%, transparent);
+  text-underline-offset: 4px;
+}
+.hero__proof-link:hover { color: var(--accent-hover); text-decoration-color: currentColor; }

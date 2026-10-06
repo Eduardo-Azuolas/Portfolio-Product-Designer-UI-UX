@@ -17,7 +17,7 @@ export const ABOUT: Record<Lang, AboutBlock[]> = {
     {
       fig: 'FIG. 03 — WHAT I BRING FROM BEFORE',
       title: 'A decade of designing under real constraints',
-      body: 'Ten years designing physical and spatial products left me with one habit that matters here: you cannot repaint a mould after tooling, so you define the mechanism before the surface and validate early. Applied to process, that thinking cut revision cycles by 22% and improved project efficiency by 30%.',
+      body: 'Ten years designing physical and spatial products left me with one habit that matters here: you cannot repaint a mould after tooling, so you define the mechanism before the surface and validate early. At Live Arq, moving validation ahead of production cut revision cycles by 22% and improved project efficiency by 30%.',
     },
     {
       fig: 'FIG. 04 — WHAT I AM LOOKING FOR',
@@ -39,7 +39,7 @@ export const ABOUT: Record<Lang, AboutBlock[]> = {
     {
       fig: 'FIG. 03 — O QUE EU TRAGO DE ANTES',
       title: 'Uma década projetando sob restrições reais',
-      body: 'Dez anos desenhando produtos físicos e espaciais me deixaram um hábito que importa aqui: não se repinta um molde depois da ferramentaria, então você define o mecanismo antes da superfície e valida cedo. Aplicado ao processo, esse raciocínio reduziu ciclos de revisão em 22% e melhorou a eficiência dos projetos em 30%.',
+      body: 'Dez anos desenhando produtos físicos e espaciais me deixaram um hábito que importa aqui: não se repinta um molde depois da ferramentaria, então você define o mecanismo antes da superfície e valida cedo. Na Live Arq, levar a validação para antes da produção reduziu ciclos de revisão em 22% e melhorou a eficiência dos projetos em 30%.',
     },
     {
       fig: 'FIG. 04 — O QUE EU PROCURO',

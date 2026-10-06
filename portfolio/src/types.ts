@@ -65,6 +65,10 @@ export type CaseStudy = {
   /** Sheet letter, e.g. "A". */
   code: string;
   year: string;
+  /** Where the work stands: client and shipped, client brief, concept. Shown on the plate and the sheet. */
+  status: Localized;
+  /** Shown on the home sheet and in the prev/next loop. The rest stay reachable by URL. */
+  featured?: boolean;
   kind: Localized;
   line: Localized;
   spec: CaseSpec;

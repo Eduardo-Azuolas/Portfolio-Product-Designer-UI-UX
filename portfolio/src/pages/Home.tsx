@@ -20,7 +20,9 @@ type Props = {
 };
 
 export function Home({ t, lang, vp, onNavigate, onOpenCase }: Props) {
-  const cards = CASES.map((c, i) => {
+  // Only the featured cases sit on the sheet; the rest stay reachable by URL.
+  const featured = CASES.map((c, i) => ({ c, i })).filter(({ c }) => c.featured);
+  const cards = featured.map(({ c, i }) => {
     return (
     // A link, not a button: reviewers open several cases in tabs to compare.
     // The name and kind label it; the rest of the card is read as its content.
@@ -28,7 +30,7 @@ export function Home({ t, lang, vp, onNavigate, onOpenCase }: Props) {
       key={c.id}
       className="plate"
       href={routeHref('cs', i)}
-      aria-labelledby={`plate-${c.id}-name plate-${c.id}-kind`}
+      aria-labelledby={`plate-${c.id}-name plate-${c.id}-kind plate-${c.id}-status`}
       onNavigate={() => onOpenCase(i)}
     >
       <span className="plate__corner" aria-hidden="true" />
@@ -57,7 +59,7 @@ export function Home({ t, lang, vp, onNavigate, onOpenCase }: Props) {
       <p className="plate__line">{pick(c.line, lang)}</p>
       <div className="plate__spacer" />
       <div className="plate__foot">
-        <span aria-hidden="true">SPEC-{c.code}</span>
+        <span className="plate__status" id={`plate-${c.id}-status`}>{pick(c.status, lang)}</span>
         <span>{c.year}</span>
         <span aria-hidden="true">{t.openSheet} →</span>
       </div>
@@ -96,6 +98,17 @@ export function Home({ t, lang, vp, onNavigate, onOpenCase }: Props) {
             {t.valueProp}
           </p>
 
+          <p data-intro className="hero__proof">
+            <span className="hero__proof-label">{t.proofLabel}</span>
+            <RouteLink
+              className="hero__proof-link"
+              href={routeHref('cs', CASES.findIndex((c) => c.id === 'pulse'))}
+              onNavigate={() => onOpenCase(CASES.findIndex((c) => c.id === 'pulse'))}
+            >
+              {t.proof} →
+            </RouteLink>
+          </p>
+
           <DimH className="hero__dim" />
 
           <div data-intro className="hero__cta">
@@ -115,7 +128,7 @@ export function Home({ t, lang, vp, onNavigate, onOpenCase }: Props) {
           as="h2"
           prefix="FIG. 02"
           label={t.workLabel}
-          meta={`${String(CASES.length).padStart(2, '0')} ${t.sheets}`}
+          meta={`${String(featured.length).padStart(2, '0')} ${t.sheets}`}
           style={{ marginBottom: 34 }}
         />
 

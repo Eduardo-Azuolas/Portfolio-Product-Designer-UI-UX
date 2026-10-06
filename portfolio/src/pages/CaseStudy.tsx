@@ -113,6 +113,8 @@ export function CaseStudy({ index, t, lang, vp, reduced, onOpenCase, onNavigate 
     zoomRef.current?.showModal();
   };
   const cs = CASES[index];
+  // A sheet whose numbers are all targets says so in its own heading.
+  const allTargets = cs.s.metrics.every((m) => m.basis === 'target');
   const media = MEDIA[cs.id];
 
   useEffect(() => {
@@ -197,11 +199,11 @@ export function CaseStudy({ index, t, lang, vp, reduced, onOpenCase, onNavigate 
   const indexItems = useMemo(
     () =>
       [
-        { key: 'hero', label: t.secResults },
+        { key: 'hero', label: allTargets ? t.secTargets : t.secResults },
         { key: 'glance', label: t.secGlance },
         ...SECTIONS.map(({ key, en, pt }) => ({ key, label: (lang === 'pt' ? pt : en).toUpperCase() })),
       ].map((it, i) => ({ ...it, n: pad2(i + 1) })),
-    [lang, t],
+    [lang, t, allTargets],
   );
 
   // The three numbers open the case rather than closing it, and the note that
@@ -229,8 +231,12 @@ export function CaseStudy({ index, t, lang, vp, reduced, onOpenCase, onNavigate 
     { k: t.kOutcome, v: pick(cs.hi.o, lang) },
   ];
 
-  const prevIndex = (index + CASES.length - 1) % CASES.length;
-  const nextIndex = (index + 1) % CASES.length;
+  // Featured sheets loop among themselves; an archived one hands the reader
+  // back into that loop rather than to the other archived sheets.
+  const loop = CASES.map((c, i) => ({ c, i })).filter(({ c }) => c.featured).map(({ i }) => i);
+  const at = loop.indexOf(index);
+  const prevIndex = at >= 0 ? loop[(at + loop.length - 1) % loop.length] : loop[loop.length - 1];
+  const nextIndex = at >= 0 ? loop[(at + 1) % loop.length] : loop[0];
   const prev = CASES[prevIndex];
   const next = CASES[nextIndex];
 
@@ -254,8 +260,8 @@ export function CaseStudy({ index, t, lang, vp, reduced, onOpenCase, onNavigate 
             <div data-reveal className="reveal">
               <FigRule
                 prefix="FIG. 01"
-                label={t.secResults}
-                meta={`SPEC-${cs.code}`}
+                label={allTargets ? t.secTargets : t.secResults}
+                meta={`${pick(cs.status, lang).toUpperCase()} · SPEC-${cs.code}`}
                 style={{ marginBottom: 22 }}
               />
 
