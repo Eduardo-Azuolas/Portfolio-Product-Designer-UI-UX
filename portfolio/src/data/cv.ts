@@ -26,7 +26,7 @@ export const CV: Record<Lang, Cv> = {
     expLabel: 'PROFESSIONAL EXPERIENCE',
     exp: [
       {
-        when: '01/2026 — PRESENT',
+        when: '08/2025 — PRESENT',
         title: 'Product Designer UX/UI',
         org: 'Freelance — São Paulo, Brazil · Remote',
         bullets: [
@@ -87,8 +87,8 @@ export const CV: Record<Lang, Cv> = {
     certLabel: 'CERTIFICATIONS',
     certs: [
       'AI Festival Workshop — Tera',
-      'UX and Design with AI — Tera',
-      'AI UX Lab Workshop — UX Unicórnio',
+      'UX and Design with AI — UX Unicórnio',
+      'AI UX Lab Workshop — Tera',
       'Figma Certification — Kodree',
       'React Specialization — Rocketseat',
       'Fullstack WebDev Bootcamp — Digital House',
@@ -135,7 +135,7 @@ export const CV: Record<Lang, Cv> = {
     expLabel: 'EXPERIÊNCIA PROFISSIONAL',
     exp: [
       {
-        when: '01/2026 — ATUAL',
+        when: '08/2025 — ATUAL',
         title: 'Product Designer UX/UI',
         org: 'Freelance — São Paulo, Brasil · Remoto',
         bullets: [
@@ -196,8 +196,8 @@ export const CV: Record<Lang, Cv> = {
     certLabel: 'CERTIFICAÇÕES',
     certs: [
       'AI Festival Workshop — Tera',
-      'UX and Design with AI — Tera',
-      'AI UX Lab Workshop — UX Unicórnio',
+      'UX and Design with AI — UX Unicórnio',
+      'AI UX Lab Workshop — Tera',
       'Certificação Figma — Kodree',
       'Especialização React — Rocketseat',
       'Bootcamp Fullstack WebDev — Digital House',
