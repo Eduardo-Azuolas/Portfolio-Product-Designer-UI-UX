@@ -7,7 +7,7 @@ import { strings } from './src/i18n/strings';
 const ORIGIN = 'https://www.eduardoazuolas.com.br';
 const SUFFIX = strings.en.titleSuffix;
 
-type Entry = { path: string; title: string; description: string };
+type Entry = { path: string; title: string; description: string; image?: string };
 
 const label = (s: string) => s.charAt(0) + s.slice(1).toLowerCase();
 
@@ -43,7 +43,7 @@ const CASE_DESCRIPTIONS: Record<string, string> = {
 const CASE_PAGES: Entry[] = CASES.map((c) => {
   const description = CASE_DESCRIPTIONS[c.id];
   if (!description) throw new Error(`prerender: no description for case "${c.id}"`);
-  return { path: c.id, title: `${c.name} — ${SUFFIX}`, description };
+  return { path: c.id, title: `${c.name} — ${SUFFIX}`, description, image: `og/${c.id}.png` };
 });
 
 const escape = (s: string) => s.replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;');
@@ -63,6 +63,10 @@ function render(template: string, e: Entry): string {
   html = setTag(html, /(<meta property="og:title" content=")[^"]*(")/, e.title);
   html = setTag(html, /(<meta property="og:description" content=")[^"]*(")/, e.description);
   html = setTag(html, /(<meta property="og:url" content=")[^"]*(")/, url);
+  if (e.image) {
+    html = setTag(html, /(<meta property="og:image" content=")[^"]*(")/, `${ORIGIN}/assets/${e.image}`);
+    html = setTag(html, /(<meta property="og:image:alt" content=")[^"]*(")/, `${e.title}`);
+  }
   return html;
 }
 
