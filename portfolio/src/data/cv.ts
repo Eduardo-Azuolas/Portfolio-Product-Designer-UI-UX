@@ -7,7 +7,7 @@ export type CvSkillGroup = { label: string; items: string[] };
 export type Cv = {
   title: string;
   summaryLabel: string;
-  /** One entry per paragraph. Mirrors the LinkedIn About section. */
+  /** One entry per paragraph: the opening and closing paragraphs of the LinkedIn About section. */
   summary: string[];
   expLabel: string;
   exp: CvExperience[];
@@ -19,8 +19,9 @@ export type Cv = {
 };
 
 /*
- * Summary and experience text is kept word-for-word in sync with the LinkedIn
- * profile (English = primary profile, Portuguese = secondary profile). If you
+ * Experience text is kept word-for-word in sync with the LinkedIn profile, and
+ * the summary uses the About section's opening and availability paragraphs
+ * verbatim (English = primary profile, Portuguese = secondary profile). If you
  * change one, change the other.
  */
 export const CV: Record<Lang, Cv> = {
@@ -30,9 +31,6 @@ export const CV: Record<Lang, Cv> = {
     summary: [
       'I design B2B and fintech products where a wrong step costs money or trust, and I measure the result: my last dashboard redesign cut time to first action by 35%.',
       'I’m a Product Designer (UX/UI) who helps B2B SaaS and fintech teams turn complex products into ones people actually use.',
-      'The problems I’m usually brought in for: onboarding where users drop off before they see value, dashboards that bury the insight people came for, and design-to-dev handoffs that lose details along the way.',
-      'On that project, a B2B analytics dashboard, I redesigned the experience around role-based insight cards after testing three directions with users. Measured in the client’s analytics, 60 days after launch vs. the 60 days before, feature adoption also rose 22% and 30-day retention 18%.',
-      'Before digital, I spent 10+ years designing physical and interactive products, with a degree in Product Design. That background taught me to prototype early, test with real people and respect production constraints. I bring the same habits to software.',
       'I’m open to remote Product Designer and UX Designer roles with US and European teams, as a contractor or full-time via employer of record. Based in São Paulo (UTC−3), with a full workday of overlap with US Eastern time. English (C1), Portuguese (native).',
     ],
     expLabel: 'PROFESSIONAL EXPERIENCE',
@@ -163,9 +161,6 @@ export const CV: Record<Lang, Cv> = {
     summary: [
       'Projeto produtos B2B e fintech em que um passo errado custa dinheiro ou confiança, e meço o resultado: meu último redesign de dashboard reduziu em 35% o tempo até a primeira ação.',
       'Sou Product Designer (UX/UI) e ajudo times de B2B SaaS e fintech a transformar produtos complexos em produtos que as pessoas realmente usam.',
-      'Os problemas que costumo resolver: onboardings em que o usuário desiste antes de ver valor, dashboards que escondem a informação que a pessoa veio buscar e handoffs entre design e desenvolvimento que perdem detalhes pelo caminho.',
-      'Nesse projeto, um dashboard de analytics B2B, redesenhei a experiência em torno de cards de insight por perfil de usuário, depois de testar três direções com usuários. Medido no analytics do cliente, 60 dias após o lançamento contra os 60 dias anteriores, a adoção de funcionalidades também subiu 22% e a retenção em 30 dias, 18%.',
-      'Antes do digital, passei mais de 10 anos projetando produtos físicos e interativos, com formação em Design de Produto. Essa trajetória me ensinou a prototipar cedo, testar com pessoas reais e respeitar as restrições de produção. Levo os mesmos hábitos para o software.',
       'Estou aberto a vagas remotas de Product Designer e UX Designer com times dos EUA e da Europa, como PJ (contractor) ou em tempo integral via employer of record. Moro em São Paulo (UTC−3), com um dia inteiro de sobreposição com o horário da costa leste dos EUA. Inglês (C1), português (nativo).',
     ],
     expLabel: 'EXPERIÊNCIA PROFISSIONAL',
