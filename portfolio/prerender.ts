@@ -4,7 +4,7 @@ import type { Plugin } from 'vite';
 import { CASES } from './src/data/cases';
 import { strings } from './src/i18n/strings';
 
-const ORIGIN = 'https://eduardoazuolas.com.br';
+const ORIGIN = 'https://www.eduardoazuolas.com.br';
 const SUFFIX = strings.en.titleSuffix;
 
 type Entry = { path: string; title: string; description: string };
@@ -30,11 +30,21 @@ const PAGES: Entry[] = [
   },
 ];
 
-const CASE_PAGES: Entry[] = CASES.map((c) => ({
-  path: c.id,
-  title: `${c.name} — ${SUFFIX}`,
-  description: `${c.kind.en}. ${c.line.en}`,
-}));
+/** Search-snippet copy per case (about 150 characters), written for the result page, not the sheet. */
+const CASE_DESCRIPTIONS: Record<string, string> = {
+  pulse: 'Case study: redesigning a B2B finance analytics dashboard around decisions, not charts. Time to first action fell 35% and feature adoption rose 22%.',
+  casado: 'Case study: a pickup-first ordering app for a home baker, with checkout that syncs the confirmed pickup time to both calendars.',
+  investiq: 'Case study: an AI investing platform that brings a fragmented portfolio into one view, with onboarding that explains each money decision.',
+  forge: 'Case study: a design system for a project-management app, built from tokens up to fix seven button variants and four input heights.',
+  aether: 'Case study: onboarding for a Web3 wallet that lets new users rehearse their first transaction in a guided simulation before sending a real one.',
+  reloop: 'Case study: a peer-to-peer secondhand fashion marketplace with a four-grade condition scale, so buyers and sellers stop guessing.',
+};
+
+const CASE_PAGES: Entry[] = CASES.map((c) => {
+  const description = CASE_DESCRIPTIONS[c.id];
+  if (!description) throw new Error(`prerender: no description for case "${c.id}"`);
+  return { path: c.id, title: `${c.name} — ${SUFFIX}`, description };
+});
 
 const escape = (s: string) => s.replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;');
 

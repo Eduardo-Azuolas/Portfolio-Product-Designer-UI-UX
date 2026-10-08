@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://eduardoazuolas.com.br/sitemap.xml
+Sitemap: https://www.eduardoazuolas.com.br/sitemap.xml
