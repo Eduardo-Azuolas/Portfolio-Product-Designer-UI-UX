@@ -38,7 +38,11 @@ export function Resume({ t, lang, vp }: Props) {
       <div className="resume__body">
         <section data-reveal className="reveal reveal--sm">
           <FigRule tight as="h2" label={cv.summaryLabel} style={{ marginBottom: 18 }} />
-          <p className="resume__summary">{cv.summary}</p>
+          {cv.summary.map((para) => (
+            <p key={para} className="resume__summary">
+              {para}
+            </p>
+          ))}
           <DimH style={{ maxWidth: 760, marginTop: 18 }} />
         </section>
 
