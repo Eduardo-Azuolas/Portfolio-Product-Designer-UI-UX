@@ -34,7 +34,9 @@ function parse(pathname: string): Route {
 /** The URL of a page, so navigation can render as real links. */
 export function routeHref(page: Page, caseIndex = 0): string {
   if (page === 'home' || page === 'notfound') return BASE;
-  return `${BASE}${page === 'cs' ? CASES[caseIndex].id : page}`;
+  // Trailing slash: that is the URL the host settles on for a prerendered
+  // <route>/index.html, so the address bar, canonical and sitemap all agree.
+  return `${BASE}${page === 'cs' ? CASES[caseIndex].id : page}/`;
 }
 
 /** Scroll offset stored on each history entry, so Back returns to it. */
@@ -44,8 +46,9 @@ type EntryState = { y?: number } | null;
  * The current page, read from and written to the address bar.
  *
  * Every navigation is a real history entry, so reload lands where you were,
- * back and forward work, and a case can be linked to directly. Deploying this
- * needs the host to serve index.html for unknown paths.
+ * back and forward work, and a case can be linked to directly. Each route is
+ * prerendered to <route>/index.html at build time (prerender.ts); other unknown
+ * paths fall back to 404.html.
  */
 export function useRoute(): [Route, (page: Page, index?: number) => void] {
   const [route, setRoute] = useState<Route>(() => parse(window.location.pathname));
