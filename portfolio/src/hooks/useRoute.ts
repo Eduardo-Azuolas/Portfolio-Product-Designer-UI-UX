@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { CASES } from '../data/cases';
+import { legacyCaseId } from '../data/legacy';
 import type { Page } from '../types';
 
 export type Route = { page: Page; caseIndex: number };
@@ -21,8 +22,16 @@ const BASE = import.meta.env.BASE_URL;
  */
 function parse(pathname: string): Route {
   const withoutBase = pathname.startsWith(BASE) ? pathname.slice(BASE.length) : pathname;
-  const segment = withoutBase.replace(/^\/+|\/+$/g, '').split('/')[0] ?? '';
+  const [segment = '', rest = ''] = withoutBase.replace(/^\/+|\/+$/g, '').split('/');
   if (!segment) return { page: 'home', caseIndex: 0 };
+
+  // Pre-redesign links (/cases/investiq.html). The build writes a stub for
+  // each known slug; this catches a stub-less one and sends an unknown slug
+  // to the work section rather than an error page.
+  if (segment === 'cases') {
+    const index = CASES.findIndex((c) => c.id === legacyCaseId(rest));
+    return index >= 0 ? { page: 'cs', caseIndex: index } : { page: 'home', caseIndex: 0 };
+  }
 
   const named = NAMED[segment];
   if (named) return { page: named, caseIndex: 0 };
@@ -96,7 +105,9 @@ export function useRoute(): [Route, (page: Page, index?: number) => void] {
     const parsed = parse(window.location.pathname);
     if (parsed.page === 'notfound') return;
     const canonical = routeHref(parsed.page, parsed.caseIndex);
-    if (window.location.pathname !== canonical) history.replaceState(null, '', canonical);
+    const legacyHome = parsed.page === 'home' && window.location.pathname !== BASE;
+    if (legacyHome) history.replaceState(null, '', `${BASE}#work`);
+    else if (window.location.pathname !== canonical) history.replaceState(null, '', canonical);
   }, []);
 
   const go = useCallback((page: Page, index?: number) => {

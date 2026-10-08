@@ -140,6 +140,14 @@ export default function App() {
     requestAnimationFrame(() => requestAnimationFrame(scroll));
   }, [go, page, reduced]);
 
+  /* An old link with an unknown slug arrives as "/#work" (see useRoute); the
+     browser cannot scroll to a section that React has not rendered yet. */
+  useEffect(() => {
+    if (window.location.hash === '#work') goWork();
+    // First load only.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   return (
     <div className="shell" data-motion={config.forceMotion ? 'full' : 'auto'}>
       <Backdrop />

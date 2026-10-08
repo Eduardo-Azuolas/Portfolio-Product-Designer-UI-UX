@@ -2,6 +2,7 @@ import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 import type { Plugin } from 'vite';
 import { CASES } from './src/data/cases';
+import { LEGACY_CASE_SLUGS } from './src/data/legacy';
 import { strings } from './src/i18n/strings';
 
 const ORIGIN = 'https://www.eduardoazuolas.com.br';
@@ -71,6 +72,34 @@ function render(template: string, e: Entry): string {
 }
 
 /**
+ * A static redirect for a pre-redesign path (/cases/investiq.html). GitHub
+ * Pages answers 200 for a real file, so crawlers and link previews read the
+ * target case's title and og tags instead of the 404 bounce. Built from the
+ * case's own prerendered page with scripts and styles removed, so nothing
+ * mounts the app over it. Not in the sitemap, and noindex: the canonical
+ * points at the new URL.
+ */
+function renderStub(page: string, id: string): string {
+  const head = page.slice(0, page.indexOf('</head>'));
+  const kept = head
+    .replace(/<script[\s\S]*?<\/script>/g, '')
+    .replace(/<link rel="(?:stylesheet|modulepreload)"[^>]*>/g, '')
+    .replace(/<link\s[^>]*(?:fonts\.g|rel="preconnect")[^>]*>/g, '')
+    .replace(/<link rel="icon"[^>]*>/, (m) => m.replace('href="/', `href="${ORIGIN}/`));
+  if (!/property="og:image" content="[^"]+"/.test(kept)) throw new Error(`prerender: stub for "${id}" lost its og:image`);
+  const target = `/${id}/`;
+  return `${kept}
+    <meta name="robots" content="noindex" />
+    <meta http-equiv="refresh" content="0; url=${target}" />
+  </head>
+  <body>
+    <p>Moved to <a href="${target}">${ORIGIN}${target}</a></p>
+  </body>
+</html>
+`;
+}
+
+/**
  * GitHub Pages has no SPA rewrite, so an unknown path answers 404 even when
  * the 404.html bounce renders the right page. A real file at <route>/index.html
  * answers 200 with the route's own title and description in the HTML a crawler
@@ -90,6 +119,14 @@ export function prerender(): Plugin {
         const dir = join(outDir, entry.path);
         mkdirSync(dir, { recursive: true });
         writeFileSync(join(dir, 'index.html'), render(template, entry));
+      }
+
+      const casesDir = join(outDir, 'cases');
+      mkdirSync(casesDir, { recursive: true });
+      for (const [slug, id] of Object.entries(LEGACY_CASE_SLUGS)) {
+        const entry = CASE_PAGES.find((e) => e.path === id);
+        if (!entry) throw new Error(`prerender: legacy slug "${slug}" points at unknown case "${id}"`);
+        writeFileSync(join(casesDir, `${slug}.html`), renderStub(render(template, entry), id));
       }
     },
   };
