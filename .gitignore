@@ -16,3 +16,10 @@ uploads/
 
 # The CV is served from portfolio/public/assets/; this copy is a duplicate
 assets/Resume-Eduardo-Azuolas-Product-Designer-UX-UI.pdf
+
+# Working notes, design-tool exports and AI session output stay local
+tasks/
+Claude outputs/
+*.dc.html
+support.js
+assets/
